@@ -28,22 +28,21 @@ void* printer(void* param){
 }
 
 void pthreadFailure(int code, char problem[], char* argv[]){
-    char buf[256];
-    strerror_r(code, buf, sizeof buf);
-    fprintf(stderr, "%s: %s thread: %s\n", argv[0], problem, buf);
+    if(code){
+        char buf[256];
+        strerror_r(code, buf, sizeof buf);
+        fprintf(stderr, "%s: %s thread: %s\n", argv[0], problem, buf);
+        exit(EXIT_FAILURE);
+    }
 }
 
-void pthreadBlock(t_sequence sequence){
+void pthreadBlock(t_sequence sequence[], char* argv[]){
     pthread_t thread;
     int code;
 
     for(int i = 0; i < DEFAULT_COUNT_OF_THREADS; i++){    
         code = pthread_create(&thread, NULL, printer, sequence + i);
-
-        if(code){
-            pthreadFailure(code, "creating", argv);
-            exit(EXI);
-        }
+        pthreadFailure(code, "creating", argv);            
     }
 }
 
@@ -53,9 +52,9 @@ int main(int argc, char *argv[]){
     for(int i = 0; i < DEFAULT_COUNT_OF_THREADS; i++)
         sequence[i].count_of_strings = DEFAULT_COUNT_OF_STRINGS;
 
-    char* first[] = {"1", "2", "3"};
-    char* second[] = {"4", "5", "6"};
-    char* third[] = {"7", "8", "9"};
+    char* first[]  = {"1",   "2",  "3"};
+    char* second[] = {"4",   "5",  "6"};
+    char* third[]  = {"7",   "8",  "9"};
     char* fourth[] = {"10", "11", "12"};
 
     sequence[0].strings = first;
@@ -63,7 +62,7 @@ int main(int argc, char *argv[]){
     sequence[2].strings = third;
     sequence[3].strings = fourth;
     
-    pthreadBlock(sequence);
+    pthreadBlock(sequence, argv);
     pthread_exit(NULL);
-    return 0;
+    exit(EXIT_SUCCESS);
 }
