@@ -33,10 +33,21 @@ void pthreadFailure(int code, char problem[], char* argv[]){
     fprintf(stderr, "%s: %s thread: %s\n", argv[0], problem, buf);
 }
 
-int main(int argc, char *argv[]){
-    pthread_t thread_pool[DEFAULT_COUNT_OF_THREADS];
+void pthreadBlock(t_sequence sequence){
     pthread_t thread;
     int code;
+
+    for(int i = 0; i < DEFAULT_COUNT_OF_THREADS; i++){    
+        code = pthread_create(&thread, NULL, printer, sequence + i);
+
+        if(code){
+            pthreadFailure(code, "creating", argv);
+            exit(EXI);
+        }
+    }
+}
+
+int main(int argc, char *argv[]){    
     t_sequence sequence[DEFAULT_COUNT_OF_THREADS];
 
     for(int i = 0; i < DEFAULT_COUNT_OF_THREADS; i++)
@@ -51,18 +62,8 @@ int main(int argc, char *argv[]){
     sequence[1].strings = second;
     sequence[2].strings = third;
     sequence[3].strings = fourth;
-
-    for(int i = 0; i < DEFAULT_COUNT_OF_THREADS; i++){    
-        code = pthread_create(&thread, NULL, printer, sequence + i);
-
-        if(code){
-            pthreadFailure(code, "creating", argv);
-            return 2;
-        }
-
-        thread_pool[i] = thread;
-    }
     
+    pthreadBlock(sequence);
     pthread_exit(NULL);
     return 0;
 }
