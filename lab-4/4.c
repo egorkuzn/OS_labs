@@ -1,7 +1,6 @@
 //Yegor Kuznetsov, 2022, NSU
-//4 threads that makes the same one function.
-//The function prints strings that are parameters.
-//Different threads prints different strings.
+//Child prints text while parent don't stop.
+//Parent stop after 2 seconds.
 
 #include <stdio.h>
 #include <stdlib.h>
