@@ -24,6 +24,15 @@ void fileFailureCheck(FILE* file, char filename[]){
     }
 }
 
+void pthreadFailureCheck(int code, char problem[], char* argv[]){
+    if(code){
+        char buf[256];
+        strerror_r(code, buf, sizeof buf);
+        fprintf(stderr, "%s: %s thread: %s\n", argv[0], problem, buf);
+        exit(EXIT_FAILURE);
+    }
+}
+
 void* printer(void* param){
     pthread_cleanup_push(cleanupNotification, NULL);
     FILE* in;
@@ -37,15 +46,6 @@ void* printer(void* param){
     fclose(in);
     pthread_cleanup_pop(1);    
     return NULL;
-}
-
-void pthreadFailureCheck(int code, char problem[], char* argv[]){
-    if(code){
-        char buf[256];
-        strerror_r(code, buf, sizeof buf);
-        fprintf(stderr, "%s: %s thread: %s\n", argv[0], problem, buf);
-        exit(EXIT_FAILURE);
-    }
 }
 
 int main(int argc, char *argv[]){   
