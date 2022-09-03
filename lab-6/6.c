@@ -9,12 +9,12 @@
 
 #define DEFAULT_FILENAME "string_collection.txt"
 #define DEFAULT_COUNT 100
-#define COEFFICIENT 1
+#define COEFFICIENT 10000
 
 void* sortFunc(void* param){
     char* string;
     string = (char*) param;
-    sleep(strlen(string) * COEFFICIENT);
+    usleep(strlen(string) * COEFFICIENT);
     printf("Length %lu: %s\n", strlen(string), string);
     return NULL;
 }
