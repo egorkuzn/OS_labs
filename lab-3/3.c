@@ -27,7 +27,7 @@ void* printer(void* param){
     return 0;
 }
 
-void pthreadFailure(int code, char problem[], char* argv[]){
+void pthreadFailureCheck(int code, char problem[], char* argv[]){
     if(code){
         char buf[256];
         strerror_r(code, buf, sizeof buf);
@@ -42,7 +42,7 @@ void pthreadBlock(t_sequence sequence[], char* argv[]){
 
     for(int i = 0; i < DEFAULT_COUNT_OF_THREADS; i++){    
         code = pthread_create(&thread, NULL, printer, sequence + i);
-        pthreadFailure(code, "creating", argv);            
+        pthreadFailureCheck(code, "creating", argv);            
     }
 }
 

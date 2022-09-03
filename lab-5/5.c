@@ -16,10 +16,19 @@ void cleanupNotification(void* param){
     printf("FINISH\n");
 }
 
+void fileFailureCheck(FILE* file, char filename[]){
+    if(!file){
+        char buf[256];
+        fprintf(stderr, "Can't open \"%s\"\n", filename);
+        exit(EXIT_FAILURE);
+    }
+}
+
 void* printer(void* param){
     pthread_cleanup_push(cleanupNotification, NULL);
     FILE* in;
     in = fopen(DEFAULT_FILE_NAME, "r");
+    fileFailureCheck(in, DEFAULT_FILE_NAME);
     char buff[BUFSIZ];    
 
     while(fscanf(in, "%s", buff))       
@@ -30,7 +39,7 @@ void* printer(void* param){
     return NULL;
 }
 
-void pthreadFailure(int code, char problem[], char* argv[]){
+void pthreadFailureCheck(int code, char problem[], char* argv[]){
     if(code){
         char buf[256];
         strerror_r(code, buf, sizeof buf);
@@ -44,12 +53,12 @@ int main(int argc, char *argv[]){
     int code;
 
     code = pthread_create(&thread, NULL, printer, NULL);
-    pthreadFailure(code, "creating", argv);
+    pthreadFailureCheck(code, "creating", argv);
 
     sleep(2);
 
     code = pthread_cancel(thread);
-    pthreadFailure(code, "canceling", argv);
+    pthreadFailureCheck(code, "canceling", argv);
     pthread_exit(NULL);
     exit(EXIT_SUCCESS);
 }

@@ -21,7 +21,7 @@ void* printer(void* param){
     fclose(in);
 }
 
-void pthreadFailure(int code, char problem[], char* argv[]){
+void pthreadFailureCheck(int code, char problem[], char* argv[]){
     if(code){
         char buf[256];
         strerror_r(code, buf, sizeof buf);
@@ -35,12 +35,12 @@ int main(int argc, char *argv[]){
     int code;
 
     code = pthread_create(&thread, NULL, printer, NULL);
-    pthreadFailure(code, "creating", argv);
+    pthreadFailureCheck(code, "creating", argv);
 
     sleep(2);
 
     code = pthread_cancel(thread);
-    pthreadFailure(code, "canceling", argv);
+    pthreadFailureCheck(code, "canceling", argv);
 
     printf("\n---\n");
     printf("FINISH\n");

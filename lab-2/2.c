@@ -21,7 +21,7 @@ void parentPrint(){
     printer("Parent");
 } 
 
-void pthreadFailure(int code, char problem[], char* argv[]){
+void pthreadFailureCheck(int code, char problem[], char* argv[]){
     char buf[256];
     strerror_r(code, buf, sizeof buf);
     fprintf(stderr, "%s: %s thread: %s\n", argv[0], problem, buf);
@@ -33,14 +33,14 @@ int main(int argc, char *argv[]){
     code = pthread_create(&thread, NULL, childPrint, NULL);
 
     if (code != 0) {
-        pthreadFailure(code, "creating", argv);
+        pthreadFailureCheck(code, "creating", argv);
         return 1;
     }
     
     code = pthread_join(thread, NULL);
 
     if(code != 0){
-        pthreadFailure(code, "joining", argv);
+        pthreadFailureCheck(code, "joining", argv);
         return 2;
     }
 
