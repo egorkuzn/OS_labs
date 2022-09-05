@@ -19,19 +19,18 @@ void* sortFunc(void* param){
     return NULL;
 }
 
-void fileFailureCheck(FILE* file, char filename[]){
+void fileFailureCheck(const FILE* file, const char filename[]){
     if(!file){
-        char buf[256];
         fprintf(stderr, "Can't open \"%s\"\n", filename);
         exit(EXIT_FAILURE);
     }
 }
 
-void pthreadFailureCheck(int code, char problem[], char* argv[]){
+void pthreadFailureCheck(const int code, const char problem[], const char programName[]){
     if(code){
-        char buf[256];
-        strerror_r(code, buf, sizeof buf);
-        fprintf(stderr, "%s: %s thread: %s\n", argv[0], problem, buf);
+        char buffer[256];
+        strerror_r(code, buffer, sizeof buffer);
+        fprintf(stderr, "%s: %s thread: %s\n", programName, problem, buffer);
         exit(EXIT_FAILURE);
     }
 }
@@ -44,17 +43,20 @@ void initStringCollection(char string_collection[DEFAULT_COUNT][BUFSIZ]){
         fscanf(in, "%s", string_collection[i]);
 }
 
-int main(int argc, char* argv[]){
-    pthread_t thread_pool[DEFAULT_COUNT];
-    char strings_collection[DEFAULT_COUNT][BUFSIZ];
+void sleepSort(const char stringsCollection[DEFAULT_COUNT][BUFSIZ], const char programName[]){
     int code;
-    initStringCollection(strings_collection);
+    pthread_t threadPool[DEFAULT_COUNT];
 
     for(int i = 0; i < DEFAULT_COUNT; i++){
-        code = pthread_create(&thread_pool[i], NULL, sortFunc, &strings_collection[i]);
-        pthreadFailureCheck(code, "creating", argv);
+        code = pthread_create(&threadPool[i], NULL, sortFunc, (void*)(stringsCollection + i));
+        pthreadFailureCheck(code, "creating", programName);
     }
+}
 
+int main(int argc, char* argv[]){
+    char stringsCollection[DEFAULT_COUNT][BUFSIZ];
+    initStringCollection(stringsCollection);
+    sleepSort(stringsCollection, argv[0]);
     pthread_exit(NULL);
     exit(EXIT_SUCCESS);
 }

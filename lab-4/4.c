@@ -54,7 +54,6 @@ int main(int argc, char *argv[]){
 //Canceling child work running:
     code = pthread_cancel(newThread);
     pthreadFailureCheck(code, "canceling", argv[0]);
-
     cleanupNotification(NULL);
 
     pthread_exit(NULL);
