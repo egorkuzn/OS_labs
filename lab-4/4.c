@@ -13,38 +13,38 @@
 void* printer(void* param){
     FILE* in;
     in = fopen(DEFAULT_FILE_NAME, "r");
-    char buff[BUFSIZ];
+    char buffer[BUFSIZ];
 
-    while(fscanf(in, "%s", buff))       
-        printf("%s ", buff);
+    while(fscanf(in, "%s", buffer) != EOF)       
+        printf("%s ", buffer);
 
     fclose(in);
 }
 
-void pthreadFailureCheck(int code, char problem[], char* argv[]){
+void pthreadFailureCheck(const int code, const char problem[], const char programName[]){
     if(code){
         char buf[256];
         strerror_r(code, buf, sizeof buf);
-        fprintf(stderr, "%s: %s thread: %s\n", argv[0], problem, buf);
+        fprintf(stderr, "%s: %s thread: %s\n", programName, problem, buf);
         exit(EXIT_FAILURE);
     }
 }
 
 int main(int argc, char *argv[]){   
-    pthread_t thread;     
+    pthread_t newThread;     
     int code;
-
-    code = pthread_create(&thread, NULL, printer, NULL);
-    pthreadFailureCheck(code, "creating", argv);
-
+//Starting child running:
+    code = pthread_create(&newThread, NULL, printer, NULL);
+    pthreadFailureCheck(code, "creating", argv[0]);
+//Waiting 2 seconds:
     sleep(2);
-
-    code = pthread_cancel(thread);
-    pthreadFailureCheck(code, "canceling", argv);
+//Canceling child work running:
+    code = pthread_cancel(newThread);
+    pthreadFailureCheck(code, "canceling", argv[0]);
 
     printf("\n---\n");
     printf("FINISH\n");
 
     pthread_exit(NULL);
-    return 0;
+    exit(EXIT_SUCCESS);
 }
