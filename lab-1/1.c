@@ -20,7 +20,7 @@ void parentPrint(){
     printer("Parent");
 } 
 
-void pthreadCreationFailure(int code, const char programName){
+void pthreadCreationFailure(const int code, const char programName){
     char buf[256];
     strerror_r(code, buf, sizeof buf);
     fprintf(stderr, "%s: creating thread: %s\n", programName, buf);

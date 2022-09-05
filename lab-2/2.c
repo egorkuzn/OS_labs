@@ -7,44 +7,47 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <string.h>
+#include <stdbool.h>
 
-void printer(char name[]){
+void printer(const char name[]){
     for(int i = 0; i < 10; i++)
         printf("%s: %d\n", name, i + 1);
 }
 
 void* childPrint(){
     printer("Child");
+    return (void*)true;
 }
 
 void parentPrint(){
     printer("Parent");
 } 
 
-void pthreadFailureCheck(int code, char problem[], char* argv[]){
-    char buf[256];
-    strerror_r(code, buf, sizeof buf);
-    fprintf(stderr, "%s: %s thread: %s\n", argv[0], problem, buf);
+void pthreadFailureCheck(const int code, const char problem[], const char programName[]){
+    if(code){
+        char buf[256];
+        strerror_r(code, buf, sizeof buf);
+        fprintf(stderr, "%s: %s thread: %s\n", programName, problem, buf);
+        exit(EXIT_FAILURE);
+    }
 }
 
 int main(int argc, char *argv[]){
-    pthread_t thread;
+    pthread_t newThread;
     int code;
-    code = pthread_create(&thread, NULL, childPrint, NULL);
+    code = pthread_create(&newThread, NULL, childPrint, NULL);
+    pthreadFailureCheck(code, "creating", argv[0]);
 
-    if (code != 0) {
-        pthreadFailureCheck(code, "creating", argv);
-        return 1;
-    }
-    
-    code = pthread_join(thread, NULL);
+//Optional part: taking return value.
+    bool message = false;
+    code = pthread_join(newThread, (void**)&message);
+    pthreadFailureCheck(code, "joining", argv[0]);
 
-    if(code != 0){
-        pthreadFailureCheck(code, "joining", argv);
-        return 2;
+    if(message){
+        printf("Joined!\n");
     }
 
     parentPrint();
     pthread_exit(NULL);
-    return 0;
+    exit(EXIT_SUCCESS);
 }
