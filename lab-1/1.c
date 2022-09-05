@@ -7,7 +7,7 @@
 #include <pthread.h>
 #include <string.h>
 
-void printer(char* name){
+void printer(const char* name){
     for(int i = 0; i < 10; i++)
         printf("%s: %d\n", name, i + 1);
 }
@@ -20,19 +20,19 @@ void parentPrint(){
     printer("Parent");
 } 
 
-void pthreadCreationFailure(int code, char* argv[]){
+void pthreadCreationFailure(int code, const char programName){
     char buf[256];
     strerror_r(code, buf, sizeof buf);
-    fprintf(stderr, "%s: creating thread: %s\n", argv[0], buf);
+    fprintf(stderr, "%s: creating thread: %s\n", programName, buf);
 }
 
 int main(int argc, char *argv[]){
-    pthread_t thread;
+    pthread_t newThread;
     int code;
-    code = pthread_create(&thread, NULL, childPrint, NULL);
+    code = pthread_create(&newThread, NULL, childPrint, NULL);
 
     if (code != 0){
-        pthreadCreationFailure(code, argv);
+        pthreadCreationFailure(code, argv[0]);
         return 1;
     }
     
