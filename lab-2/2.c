@@ -25,9 +25,9 @@ void parentPrint(){
 
 void pthreadFailureCheck(const int code, const char problem[], const char programName[]){
     if(code){
-        char buf[256];
-        strerror_r(code, buf, sizeof buf);
-        fprintf(stderr, "%s: %s thread: %s\n", programName, problem, buf);
+        char bufffer[256];
+        strerror_r(code, bufffer, sizeof bufffer);
+        fprintf(stderr, "%s: %s thread: %s\n", programName, problem, bufffer);
         exit(EXIT_FAILURE);
     }
 }

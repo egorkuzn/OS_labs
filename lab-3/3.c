@@ -29,9 +29,9 @@ void* printer(void* param){
 
 void pthreadFailureCheck(const int code, const char problem[], const char programName[]){
     if(code){
-        char buf[256];
-        strerror_r(code, buf, sizeof buf);
-        fprintf(stderr, "%s: %s thread: %s\n", programName, problem, buf);
+        char buffer[256];
+        strerror_r(code, buffer, sizeof buffer);
+        fprintf(stderr, "%s: %s thread: %s\n", programName, problem, buffer);
         exit(EXIT_FAILURE);
     }
 }

@@ -21,9 +21,9 @@ void parentPrint(){
 } 
 
 void pthreadCreationFailure(const int code, const char programName){
-    char buf[256];
-    strerror_r(code, buf, sizeof buf);
-    fprintf(stderr, "%s: creating thread: %s\n", programName, buf);
+    char buffer[256];
+    strerror_r(code, buffer, sizeof buffer);
+    fprintf(stderr, "%s: creating thread: %s\n", programName, buffer);
 }
 
 int main(int argc, char *argv[]){
