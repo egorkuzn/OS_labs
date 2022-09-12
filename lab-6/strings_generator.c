@@ -30,7 +30,7 @@ int main(){
 
     for(int i = 0; i < DEFAULT_COUNT; i++){
         int size = 0;
-        char* buffer = calloc(randomSize(&size), sizeof(char));
+        char* buffer = (char*)calloc(randomSize(&size), sizeof(char));
         initBuffer(buffer, size);
         fprintf(out, "%s\n", buffer);
     }
