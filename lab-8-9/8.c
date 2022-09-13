@@ -12,8 +12,9 @@
 #include <signal.h>
 #include <locale.h>
 #include <stddef.h>
+#include <stdatomic.h>
 
-bool commandToStop = false;
+atomic_bool commandToStop = false;
 
 typedef struct{
     int threadNum;
@@ -29,18 +30,18 @@ void threadCalculationsInit(int* threadNum,
     *threadNum = info->threadNum;
     *countOfThreads = info->countOfThreads;
     *stepsNum = info->stepsNum;
+    *result = 0;
 }
 
 void* threadCalculations(void* param){
     int threadNum, countOfThreads, stepsNum;
     double* result = (double*)calloc(1, sizeof(double));
-    
+
     threadCalculationsInit(&threadNum,
                            &countOfThreads,
                            &stepsNum,
                            result,
                            (threadInfo_t*)param);
-
 
     for(u_long start = threadNum * stepsNum; \
                    !commandToStop && start < __LONG_LONG_MAX__; \
@@ -109,8 +110,8 @@ double getPi(const int countOfThreads,
 }
 
 int main(int argc, char* argv[]){
-    setSignalHandler(SIGINT, sigStop);
     setSignalHandler(SIGTERM, sigStop);
+    setSignalHandler(SIGINT, sigStop);
     printf("\nπ done - %.15g \n", getPi(4, 10000, argv[0]));    
     pthread_exit(NULL);
     exit(EXIT_SUCCESS);
