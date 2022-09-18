@@ -1,7 +1,5 @@
-/* 
-    Yegor Kuznetsov, 2022, NSU
-    Calculation of π, while user don't stop our program. 
-*/
+//Yegor Kuznetsov, 2022, NSU
+//Calculation of π, while user don't stop our program. 
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -129,8 +127,8 @@ double getPi(const int countOfThreads,
 }
 
 int main(int argc, char* argv[]){
-    setSignalHandler(SIGTERM, sigStop);
     setSignalHandler(SIGINT, sigStop);
+    setSignalHandler(SIGTERM, sigStop);
     printf("\nπ done - %.15g \n", getPi(8, 10000, argv[0])); 
     pthread_exit(NULL);
     exit(EXIT_SUCCESS);
