@@ -12,6 +12,9 @@
 #include <stddef.h>
 #include <stdatomic.h>
 
+#define pthread_check(a) pthreadFailureCheck(__LINE__, a, __FUNCTION__, __FILE__)
+#define DEFAULT_COUNT 8
+
 static atomic_bool commandToStop = false;
 atomic_int countOfFinishedThreads = 0;
 
@@ -39,6 +42,7 @@ void myPthreadBarrier(int countOfThreads){
         fprintf(stderr, "Problem in myPthreadBarrier() code.\n");
         exit(EXIT_FAILURE);
     }
+
 
     while(countOfFinishedThreads != countOfThreads && !commandToStop)
         usleep(100);
@@ -86,12 +90,13 @@ void setSignalHandler(int signal, void(*handler)(int)){
     sigaction(signal, &action, NULL);
 }
 
-void pthreadFailureCheck(const int code,
-                         const char problem[],
+void pthreadFailureCheck(const int line,\
+                         const int code,\
+                         const char function[],\
                          const char programName[]){
     if(code){
-        fprintf(stderr, "%s: %s thread: %s\n", \
-                programName, problem, strerror_l(code, LC_CTYPE));
+        fprintf(stderr, "%s::%s()::%d pthread function: %s\n",\
+         programName, function, line, strerror_l(code, LC_CTYPE));
         exit(EXIT_FAILURE);
     }
 }
@@ -107,20 +112,18 @@ double getPi(const int countOfThreads,
     for(int i = 0; i < countOfThreads; i++){
         threadInfo_t newInfo = {i, countOfThreads, numOfSteps};
         infoPool[i] = newInfo;
-        code = pthread_create(&threadPool[i], NULL, threadCalculations,\
-                                                        (void*)(infoPool + i));
-        pthreadFailureCheck(code, "creating", programName);
+        pthread_check(pthread_create(&threadPool[i], NULL, threadCalculations,\
+                                                        (void*)(infoPool + i)));
     }
 
     double pi = 0;
 
     for(int i = 0; i < countOfThreads; i++){
         double* result;
-        code = pthread_join(threadPool[i], (void**)&result);
-        pthreadFailureCheck(code, "joining", programName);
+        pthread_check(pthread_join(threadPool[i], (void**)&result));
         pi += *result;
         free(result);
-    }    
+    }  
 
     pi *= 4.0;
     return pi;
@@ -129,7 +132,7 @@ double getPi(const int countOfThreads,
 int main(int argc, char* argv[]){
     setSignalHandler(SIGINT, sigStop);
     setSignalHandler(SIGTERM, sigStop);
-    printf("\nπ done - %.15g \n", getPi(8, 10000, argv[0])); 
+    printf("\nπ done - %.15g \n", getPi(DEFAULT_COUNT, 10000, argv[0])); 
     pthread_exit(NULL);
     exit(EXIT_SUCCESS);
 }

@@ -12,6 +12,7 @@
 #define DELAY 30000
 #define FOOD 50
 #define PROGRAM_NAME "10"
+#define pthread_check(a) pthreadFailureCheck(__LINE__, a, __FUNCTION__, __FILE__)
 
 pthread_t phils[PHILO];
 pthread_mutex_t forks[PHILO];
@@ -19,12 +20,13 @@ pthread_mutex_t foodlock;
 pthread_mutex_t getting_forks_mx;
 pthread_cond_t getting_forks_cond;
 
-void pthreadFailureCheck(const int code,
-                         const char problem[],
+void pthreadFailureCheck(const int line,\
+                         const int code,\
+                         const char function[],\
                          const char programName[]){
     if(code){
-        fprintf(stderr, "%s: %s thread: %s\n", \
-                programName, problem, strerror_l(code, LC_CTYPE));
+        fprintf(stderr, "%s::%s()::%d pthread function: %s\n",\
+         programName, function, line, strerror_l(code, LC_CTYPE));
         exit(EXIT_FAILURE);
     }
 }
@@ -99,19 +101,23 @@ void* philosopher (void* num){
 }
 
 int main(int argn, char **argv){
-    pthread_mutex_init(&foodlock, NULL);
-    pthread_cond_init(&getting_forks_cond, NULL);
+    pthread_check(pthread_mutex_init(&foodlock, NULL));
+    pthread_check(pthread_cond_init(&getting_forks_cond, NULL));
 
     for(int i = 0; i < PHILO; i++)
-        pthread_mutex_init(&forks[i], NULL);
+        pthread_check(pthread_mutex_init(&forks[i], NULL));
 
     for(int i = 0; i < PHILO; i++)
-        pthread_create(&phils[i], NULL, philosopher, (void*)i);
+        pthread_check(pthread_create(&phils[i], NULL, philosopher, (void*)i));
 
     for(int i = 0; i < PHILO; i++)
-        pthread_join(phils[i], NULL);
+        pthread_check(pthread_join(phils[i], NULL));
 
-    pthread_cond_destroy(&getting_forks_cond);
+    for(int i = 0; i < PHILO; i++)
+        pthread_check(pthread_mutex_destroy(&forks[i]));
+        
+    pthread_check(pthread_mutex_destroy(&foodlock));
+    pthread_check(pthread_cond_destroy(&getting_forks_cond));
     pthread_exit(NULL);
     exit(EXIT_SUCCESS);
 }
