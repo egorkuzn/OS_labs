@@ -15,8 +15,8 @@
 #define pthread_check(a) pthreadFailureCheck(__LINE__, a, __FUNCTION__, __FILE__)
 #define DEFAULT_COUNT 8
 
-static atomic_bool commandToStop = false;
-atomic_int countOfFinishedThreads = 0;
+atomic_bool commandToStop = false;
+atomic_ulong end = 0;
 
 typedef struct{
     int threadNum;
@@ -35,22 +35,8 @@ void threadCalculationsInit(int* threadNum,
     *result = 0;
 }
 
-void myPthreadBarrier(int countOfThreads){
-    countOfFinishedThreads++;
-
-    if(countOfFinishedThreads > countOfThreads){
-        fprintf(stderr, "Problem in myPthreadBarrier() code.\n");
-        exit(EXIT_FAILURE);
-    }
-
-
-    while(countOfFinishedThreads != countOfThreads && !commandToStop)
-        usleep(100);
-
-    countOfFinishedThreads--;
-}
-
 void* threadCalculations(void* param){
+    u_long end_copy;
     int threadNum, countOfThreads, stepsNum;
     double* result = (double*)calloc(1, sizeof(double));
 
@@ -60,16 +46,15 @@ void* threadCalculations(void* param){
                            result,
                            (threadInfo_t*)param);
 
-    for(u_long start = threadNum * stepsNum; \
-                    !commandToStop && start < __LONG_LONG_MAX__; \
-                                        start += countOfThreads * stepsNum){
-        for (u_long i = start; i < start + stepsNum; i++)        
+    while (!commandToStop){
+        end += stepsNum;
+        end_copy = end;
+        
+        for (u_long i = end_copy - stepsNum; i < end_copy && i < __LONG_LONG_MAX__; i++)        
             *result += 1.0 / (i * 4.0 + 1.0)  -  1.0 / (i * 4.0 + 3.0);
+    }    
     
-        myPthreadBarrier(countOfThreads);
-    }
-    
-    printf("%d\n", countOfFinishedThreads);
+    printf("finished\n");
     pthread_exit(result);
 }
 
