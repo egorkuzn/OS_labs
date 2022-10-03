@@ -39,7 +39,7 @@ void* threadCalculations(void* param){
     u_long end_copy;
     int threadNum, countOfThreads, stepsNum;
     double* result = (double*)calloc(1, sizeof(double));
-
+    
     threadCalculationsInit(&threadNum,
                            &countOfThreads,
                            &stepsNum,

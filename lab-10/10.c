@@ -36,11 +36,10 @@ int food_on_table(){
     int myfood;
 
     pthread_mutex_lock(&foodlock);
+    myfood = food;
 
     if(food > 0)
-        food--;
-    
-    myfood = food;
+        food--;    
     pthread_mutex_unlock(&foodlock);
     return myfood;
 }
@@ -88,15 +87,18 @@ void* philosopher (void* num){
     if(left_fork == PHILO)
         left_fork = 0;
  
+    int portionsCount = 0;
+
     while((f = food_on_table()) > 0){
         printf("Philosopher %d: get dish %d.\n", id, f);
         get_forks(right_fork, left_fork, id);
         printf("Philosopher %d: eating.\n", id);
         usleep(DELAY * (FOOD - f + 1));
         down_forks(left_fork, right_fork);
+        ++portionsCount;
     }
-
-    printf("Philosopher %d is done eating.\n", id);
+    
+    printf("+++Philosopher %d is done eating. %d at all+++\n", id, portionsCount);
     return(NULL);
 }
 
