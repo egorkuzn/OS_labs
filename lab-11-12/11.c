@@ -11,7 +11,7 @@
 #include <locale.h>
 
 #define pthread_check(a) pthreadFailureCheck(__LINE__, a, __FUNCTION__, __FILE__)
-#define COUNT_OF_ITERATIONS 100000
+#define COUNT_OF_ITERATIONS 5
 
 pthread_mutexattr_t attr;
 pthread_mutex_t m1;
@@ -30,9 +30,9 @@ void pthreadFailureCheck(const int line,\
 }
 
 void destroyMutex() {
-    pthread_mutex_destroy(&m1);
-    pthread_mutex_destroy(&m2);
-    pthread_mutex_destroy(&m3);
+    pthread_check(pthread_mutex_destroy(&m1));
+    pthread_check(pthread_mutex_destroy(&m2));
+    pthread_check(pthread_mutex_destroy(&m3));
 }
 
 void stop(char *errorMsg) {
@@ -66,12 +66,12 @@ void initMutexes() {
 }
 
 void *childPrint(void* param) {
+    // Really important mutex for child blocking:
     lockMutex(&m2);
     
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < COUNT_OF_ITERATIONS; ++i) {
         lockMutex(&m1);
-
-        printf("Child %i\n", i);
+        printf("|Child\t|%i\t|\n", i);
 
         unlockMutex(&m2);
         lockMutex(&m3);
@@ -79,14 +79,15 @@ void *childPrint(void* param) {
         lockMutex(&m2);
         unlockMutex(&m3);
     }
-    
+    // In case of 79 string:
     unlockMutex(&m2);
+
     return NULL;
 }
 
 void parentPrint() {
     for (int i = 0; i < COUNT_OF_ITERATIONS; ++i) {
-        printf("Parent %i\n", i);
+        printf("|Parent\t|%i\t|\n", i);
 
         lockMutex(&m3);
         unlockMutex(&m1);
@@ -95,14 +96,17 @@ void parentPrint() {
         lockMutex(&m1);
         unlockMutex(&m2);
     }
-
+    //In case of 96 string:
     unlockMutex(&m1);
 }
 
 int main() {
+    printf("|WHO\t|TIME\t|\n");
+
     pthread_t myThread;
 
     initMutexes();
+    // Blocking for getting parent first:
     lockMutex(&m1);
     // Child thread creation:
     pthread_check(pthread_create(&myThread, NULL, childPrint, NULL)); 
