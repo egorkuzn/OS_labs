@@ -14,7 +14,7 @@ void printer(const char name[]){
         printf("%s: %d\n", name, i + 1);
 }
 
-void* childPrint(){
+void* childPrint(void* param){
     printer("Child");
     return (void*)true;
 }
