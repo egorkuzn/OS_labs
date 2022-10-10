@@ -5,7 +5,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <string.h>
 #include <locale.h>
 #include <unistd.h>
@@ -86,6 +85,7 @@ void printerSemDestroy(int pid){
 
     if(WIFEXITED(status)){
         printf("\nSemaphore destruction as soon as child finished.\n");
+
         for(u_char i = 0; i < 2; i++)
             pthread_check(sem_destroy(printerSemArray[i]));
     }
