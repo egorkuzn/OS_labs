@@ -6,6 +6,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <string.h>
 #include <pthread.h>
 #include <unistd.h>
@@ -18,7 +19,7 @@
 
 typedef struct linked_list {
     char buffer[LENGTH];
-    linked_list* next;
+    struct linked_list* next;
 } linked_list;
 
 linked_list* mainList = NULL;
@@ -26,6 +27,9 @@ pthread_mutex_t mutex;
 
 void initListToAdd(linked_list* listToAdd) {
     listToAdd -> next = NULL;
+    /*
+        TODO: make smth with read
+    */
     read(STDIN_FILENO, listToAdd -> buffer, LENGTH);
 }
 
@@ -66,17 +70,12 @@ void terminalReader(char buffer[LENGTH]) {
 }
 
 bool isEmpty(linked_list* list) {
-    return list -> next == NULL;
+    return strlen(list -> buffer) == 0;
 }
 
 void insertToTheHead(linked_list** mainList, linked_list* listToAdd)  {
     listToAdd -> next = *mainList;
     *mainList = listToAdd;
-}
-
-void insertToTheMiddle(linked_list* left, linked_list* newNode, linked_list* right) {
-    left -> next = newNode;
-    newNode -> next = right;
 }
 
 bool compare(linked_list* left, linked_list* right) {
@@ -86,7 +85,7 @@ bool compare(linked_list* left, linked_list* right) {
 // 1->[2]->3->[4]->5
 // 1->[4]->3->[2]->5
 
-void swap(linked_list* left, linked_list* right) {
+void linkedListSwap(linked_list* left, linked_list* right) {
     char tmp_buffer[LENGTH];
 
     memcpy(tmp_buffer     , right -> buffer, LENGTH);
@@ -98,7 +97,7 @@ void linkedListBubbleSort(linked_list* list) {
     for(linked_list* i = list; !i; i = i -> next)
         for(linked_list* j = i; !j; j = j -> next)
             if(compare(i, j))
-                swap(i, j);
+                linkedListSwap(i, j);
 }
 
 void* sorterThreadRoutine(void* param) {
@@ -119,6 +118,8 @@ void readerFunction() {
 
         if(!isEmpty(listToAdd))
             insertToTheHead(&mainList, listToAdd);
+        else
+            printf("%s\n", mainList -> buffer);
 
         pthread_mutex_unlock(&mutex);
     }    
@@ -126,9 +127,11 @@ void readerFunction() {
 
 int main(int argc, char* argv[]) {
     pthread_t sorterThread;
+    pthread_check(pthread_mutex_init(&mutex, NULL));
     pthread_check(pthread_create(&sorterThread, NULL, sorterThreadRoutine, NULL));
     readerFunction();
     pthread_exit(NULL);
+    pthread_check(pthread_mutex_destroy(&mutex));
     linkedListDestroy();
     exit(EXIT_SUCCESS);
 }
