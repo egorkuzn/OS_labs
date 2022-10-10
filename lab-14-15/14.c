@@ -12,7 +12,7 @@
 #include <semaphore.h>
 
 #define pthread_check(a) pthreadFailureCheck(__LINE__, a, __FUNCTION__, __FILE__)
-#define COUNT_OF_STRINGS 5
+#define COUNT_OF_STRINGS 100
 
 sem_t printerSemArray[2];
 

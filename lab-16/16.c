@@ -15,6 +15,7 @@
 #include <semaphore.h>
 
 #define pthread_check(a) pthreadFailureCheck(__LINE__, a, __FUNCTION__, __FILE__)
+#define memory_check(a) memoryFailureCheck(__LINE__, a, __FUNCTION__, __FILE__)
 #define COUNT_OF_STRINGS 5
 
 sem_t* printerSemArray[2];
@@ -32,6 +33,17 @@ void pthreadFailureCheck(const int line,\
                          const char programName[]){
     if(code){
         fprintf(stderr, "%s::%s()::%d pthread function: %s\n",\
+         programName, function, line, strerror_l(code, LC_CTYPE));
+        exit(EXIT_FAILURE);
+    }
+}
+
+void memoryFailureCheck(const int line,\
+                         const int code,\
+                         const char function[],\
+                         const char programName[]){
+    if(code){
+        fprintf(stderr, "%s::%s()::%d mmap function: %s\n",\
          programName, function, line, strerror_l(code, LC_CTYPE));
         exit(EXIT_FAILURE);
     }
@@ -86,8 +98,11 @@ void printerSemDestroy(int pid){
     if(WIFEXITED(status)){
         printf("\nSemaphore destruction as soon as child finished.\n");
 
-        for(u_char i = 0; i < 2; i++)
-            pthread_check(sem_destroy(printerSemArray[i]));
+        pthread_check(sem_destroy(printerSemArray[0]));
+        pthread_check(sem_destroy(printerSemArray[1]));
+
+        memory_check(munmap(printerSemArray[0], sizeof(sem_t)));
+        memory_check(munmap(printerSemArray[1], sizeof(sem_t)));
     }
 }
 
