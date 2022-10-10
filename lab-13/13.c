@@ -1,7 +1,7 @@
 //Yegor Kuznetsov, 2022, NSU
 //One thread creation. Default attributes.
 //Parent and child printing 10 strings.
-//Syncronized modification.
+//Syncronized modification with conditional variable.
 
 #include <stdio.h>
 #include <stdlib.h>
