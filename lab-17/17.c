@@ -21,7 +21,7 @@ typedef struct linked_list {
     linked_list* next;
 } linked_list;
 
-linked_list* mainList;
+linked_list* mainList = NULL;
 pthread_mutex_t mutex;
 
 void initListToAdd(linked_list* listToAdd) {
@@ -40,6 +40,14 @@ linked_list* getSharedPointer() {
     close(fd);
 
     return sharedPointer;
+}
+
+void linkedListDestroy(){
+    while (!mainList){
+        linked_list* next = mainList -> next;
+        munmap(mainList, sizeof(linked_list));
+        mainList = next;
+    }    
 }
 
 void pthreadFailureCheck(const int line,\
@@ -121,5 +129,6 @@ int main(int argc, char* argv[]) {
     pthread_check(pthread_create(&sorterThread, NULL, sorterThreadRoutine, NULL));
     readerFunction();
     pthread_exit(NULL);
+    linkedListDestroy();
     exit(EXIT_SUCCESS);
 }
