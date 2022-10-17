@@ -66,9 +66,9 @@ void sort(linkedList* head) {
     if (head == NULL)
         return;
 
-    linkedList * left = head;                 
-    linkedList * right = head -> next;          
-    linkedList * temp = (linkedList *)malloc(sizeof(linkedList));
+    linkedList* left = head;                 
+    linkedList* right = head -> next;          
+    linkedList* temp = (linkedList *)malloc(sizeof(linkedList));
 
     temp -> str = (char *)calloc(MAX_SRING_SIZE + 1, sizeof(char));       
 
