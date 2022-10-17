@@ -11,7 +11,7 @@
 #include <locale.h>
 #include <semaphore.h>
 
-#define pthread_check(a) pthreadFailureCheck(__LINE__, a, __FUNCTION__, __FILE__)
+#define PCH(a) pthreadFailureCheck(__LINE__, a, __FUNCTION__, __FILE__)
 #define COUNT_OF_STRINGS 100
 
 sem_t printerSemArray[2];
@@ -66,12 +66,12 @@ void pthreadCreationFailure(const int code, const char programName[]){
 
 void printerSemInit(){
     for(u_char i = 0; i < 2; i++) 
-        pthread_check(sem_init(&printerSemArray[i], 0, 1 - i));
+        PCH(sem_init(&printerSemArray[i], 0, 1 - i));
 }
 
 void printerSemDestroy(){
     for(u_char i = 0; i < 2; i++)
-        pthread_check(sem_destroy(&printerSemArray[i]));
+        PCH(sem_destroy(&printerSemArray[i]));
 }
 
 int main(int argc, char *argv[]){
@@ -79,7 +79,7 @@ int main(int argc, char *argv[]){
     // Semaphores initialization:
     printerSemInit();
     // Child thread creation:
-    pthread_check(pthread_create(&newThread, NULL, childPrint, NULL));   
+    PCH(pthread_create(&newThread, NULL, childPrint, NULL));   
     // Parent thread work: 
     parentPrint();
     pthread_exit(NULL);

@@ -12,7 +12,7 @@
 #include <stddef.h>
 #include <stdatomic.h>
 
-#define pthread_check(a) pthreadFailureCheck(__LINE__, a, __FUNCTION__, __FILE__)
+#define PCH(a) pthreadFailureCheck(__LINE__, a, __FUNCTION__, __FILE__)
 #define DEFAULT_COUNT 8
 
 atomic_bool commandToStop = false;
@@ -97,7 +97,7 @@ double getPi(const int countOfThreads,
     for(int i = 0; i < countOfThreads; i++){
         threadInfo_t newInfo = {i, countOfThreads, numOfSteps};
         infoPool[i] = newInfo;
-        pthread_check(pthread_create(&threadPool[i], NULL, threadCalculations,\
+        PCH(pthread_create(&threadPool[i], NULL, threadCalculations,\
                                                         (void*)(infoPool + i)));
     }
 
@@ -105,7 +105,7 @@ double getPi(const int countOfThreads,
 
     for(int i = 0; i < countOfThreads; i++){
         double* result;
-        pthread_check(pthread_join(threadPool[i], (void**)&result));
+        PCH(pthread_join(threadPool[i], (void**)&result));
         pi += *result;
         free(result);
     }  

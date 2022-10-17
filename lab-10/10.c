@@ -12,7 +12,7 @@
 #define DELAY 30000
 #define FOOD 50
 #define PROGRAM_NAME "10"
-#define pthread_check(a) pthreadFailureCheck(__LINE__, a, __FUNCTION__, __FILE__)
+#define PCH(a) pthreadFailureCheck(__LINE__, a, __FUNCTION__, __FILE__)
 
 pthread_t phils[PHILO];
 pthread_mutex_t forks[PHILO];
@@ -103,23 +103,23 @@ void* philosopher (void* num){
 }
 
 int main(int argn, char **argv){
-    pthread_check(pthread_mutex_init(&foodlock, NULL));
-    pthread_check(pthread_cond_init(&getting_forks_cond, NULL));
+    PCH(pthread_mutex_init(&foodlock, NULL));
+    PCH(pthread_cond_init(&getting_forks_cond, NULL));
 
     for(int i = 0; i < PHILO; i++)
-        pthread_check(pthread_mutex_init(&forks[i], NULL));
+        PCH(pthread_mutex_init(&forks[i], NULL));
 
     for(int i = 0; i < PHILO; i++)
-        pthread_check(pthread_create(&phils[i], NULL, philosopher, (void*)i));
+        PCH(pthread_create(&phils[i], NULL, philosopher, (void*)i));
 
     for(int i = 0; i < PHILO; i++)
-        pthread_check(pthread_join(phils[i], NULL));
+        PCH(pthread_join(phils[i], NULL));
 
     for(int i = 0; i < PHILO; i++)
-        pthread_check(pthread_mutex_destroy(&forks[i]));
+        PCH(pthread_mutex_destroy(&forks[i]));
         
-    pthread_check(pthread_mutex_destroy(&foodlock));
-    pthread_check(pthread_cond_destroy(&getting_forks_cond));
+    PCH(pthread_mutex_destroy(&foodlock));
+    PCH(pthread_cond_destroy(&getting_forks_cond));
     pthread_exit(NULL);
     exit(EXIT_SUCCESS);
 }

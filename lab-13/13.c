@@ -10,7 +10,7 @@
 #include <string.h>
 #include <locale.h>
 
-#define pthread_check(a) pthreadFailureCheck(__LINE__, a, __FUNCTION__, __FILE__)
+#define PCH(a) pthreadFailureCheck(__LINE__, a, __FUNCTION__, __FILE__)
 #define COUNT_OF_STRINGS 100000
 
 char previousActor;
@@ -83,18 +83,18 @@ int main(int argc, char *argv[]){
     pthread_t newThread;
     pthread_mutexattr_t terminal_attr;
     // Mutex initialization:
-    pthread_check(pthread_cond_init(&terminal_printing_cond, NULL));
-    pthread_check(pthread_mutexattr_init(&terminal_attr));
-    pthread_check(pthread_mutexattr_settype(&terminal_attr, PTHREAD_MUTEX_ERRORCHECK));
-    pthread_check(pthread_mutex_init(&terminal_printing_mx, &terminal_attr));
+    PCH(pthread_cond_init(&terminal_printing_cond, NULL));
+    PCH(pthread_mutexattr_init(&terminal_attr));
+    PCH(pthread_mutexattr_settype(&terminal_attr, PTHREAD_MUTEX_ERRORCHECK));
+    PCH(pthread_mutex_init(&terminal_printing_mx, &terminal_attr));
     // Child thread creation:
-    pthread_check(pthread_create(&newThread, NULL, childPrint, NULL));   
+    PCH(pthread_create(&newThread, NULL, childPrint, NULL));   
     // Parent thread work: 
     parentPrint();
     pthread_exit(NULL);
     // Mutex destroy after 2 threads finished their works:
     pthread_mutex_destroy(&terminal_printing_mx);
-    pthread_check(pthread_cond_destroy(&terminal_printing_cond));
+    PCH(pthread_cond_destroy(&terminal_printing_cond));
 
     exit(EXIT_SUCCESS);
 }

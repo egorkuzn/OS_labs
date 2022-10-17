@@ -5,236 +5,152 @@
 // operations with list should be syncronized by mutex.
 
 #include <stdio.h>
-#include <stdint.h>
 #include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <locale.h>
-#include <stddef.h>
-#include <pthread.h>
 #include <stdbool.h>
+#include <pthread.h>
+#include <string.h>
+#include <locale.h>
+#include <unistd.h>
 
-#define pthread_check(a) pthreadFailureCheck(__LINE__, a, __FUNCTION__, __FILE__)
-#define pthread_check_with_list(a, b) stop(a, b, __FUNCTION__, __LINE__)
+#define PCH(a) pthreadFailureCheck(__LINE__, a, __FUNCTION__, __FILE__)
+#define MAX_SRING_SIZE 80
+#define DEFAULT_TIME_WAIT 5
 
-typedef struct linkedList{
+typedef struct linkedList {
+    char* str;
     struct linkedList* next;
-    char* val;
 } linkedList;
-
-int returnFromThreads = 0;
-pthread_t threadSorter;
-pthread_mutex_t mutex;
 
 void pthreadFailureCheck(const int line,\
                          const int code,\
                          const char function[],\
-                         const char programName[]){
-    if(code){
+                         const char programName[]) {
+    if (code) {
         fprintf(stderr, "%s::%s()::%d pthread function: %s\n",\
          programName, function, line, strerror_l(code, LC_CTYPE));
         exit(EXIT_FAILURE);
     }
 }
 
-void freeList(linkedList* head) {
-    linkedList* next;
+linkedList* addStringNode(linkedList * head, char * string) {
+    linkedList* curHead = head;
+    size_t strSize = strlen(string);
 
-    for (linkedList* node = head; node; node = next) {
-        next = node -> next;
-        free(node);
+    if (strSize > MAX_SRING_SIZE)
+        curHead = addStringNode(curHead, string + MAX_SRING_SIZE);
+
+    linkedList* newHead = (linkedList*) malloc(sizeof(linkedList));
+    newHead -> str = (char*)calloc(MAX_SRING_SIZE + 1, sizeof(char));
+    strncpy(newHead -> str, string, strSize % (MAX_SRING_SIZE + 1));
+    newHead -> next = curHead;
+
+    return newHead;
+}
+
+void printList(linkedList* head) {
+    linkedList* cur = head;
+
+    while (cur != NULL) {
+        printf("%s", cur->str);
+        cur = cur->next;
     }
 }
 
-void stop(linkedList* head, int code, const char* function, const int line) {
-    if(code) {
-        pthread_check(pthread_mutex_destroy(&mutex));
-        freeList(head);
-        pthreadFailureCheck(line, code, function, __FILE__);
-    }
+void swap(linkedList* left, linkedList* right) {
+    char* temp = right -> str;
+    right -> str = left -> str;
+    left -> str = temp;
 }
 
-void lockMutex(linkedList* head) {
-    pthread_check_with_list(head, pthread_mutex_lock(&mutex));
-}
-
-void unlockMutex(linkedList* head) {
-    pthread_check_with_list(head, pthread_mutex_unlock(&mutex));
-}
-
-size_t listSize(linkedList** head) {
-    size_t size = 0;
-
-    for (linkedList* node = (*head); node && (size < SIZE_MAX); node = node -> next, size++);
-
-    return size;
-}
-
-linkedList* nodeValueSet(linkedList* node, const char* str){
-    if (!strcpy(node -> val, str)) {
-        free(node -> val);
-        free(node);
-        return NULL;
-    }
-
-    return node;
-}
-
-linkedList* createNode(const char* str) {
-    linkedList* node = (linkedList*) malloc(sizeof(linkedList));
-
-    if (!node) {
-        free(node);
-        printf("malloc\n");
-        return NULL;
-    }
-
-    node -> next = NULL;
-    node -> val  = (char*) malloc(strlen(str) + 1);
-
-    return nodeValueSet(node, str);
-}
-
-void pushToList(linkedList** head, const char* sentence) {
-    lockMutex(*head);
-
-    linkedList *oldHead = (*head);
-    linkedList *node = createNode(sentence);
-
-    if (!node)
+void sort(linkedList* head) {
+    if (head == NULL)
         return;
 
-    *head = node;
-    (*head) -> next = oldHead;
+    linkedList * left = head;                 
+    linkedList * right = head -> next;          
+    linkedList * temp = (linkedList *)malloc(sizeof(linkedList));
 
-    unlockMutex(*head);
+    temp -> str = (char *)calloc(MAX_SRING_SIZE + 1, sizeof(char));       
+
+    for (; left -> next; left = left -> next, right = left -> next)               
+        for (; right; right = right -> next)
+            if (strncmp(left->str, right->str, MAX_SRING_SIZE) > 0)
+                swap(left, right);
+
+    free(temp -> str);
+    free(temp);
 }
-//Pointer swap - the most effective swap
-void swap(linkedList* ptr1, linkedList* ptr2) {
-    linkedList* tmp = ptr2 -> next;
-    ptr2 -> next = ptr1;
-    ptr1 -> next = tmp;
+
+
+linkedList* list;
+pthread_mutex_t listMutex;
+pthread_mutex_t sortFlagMutex;
+pthread_cond_t condVar;
+int sortFlag = 0;
+
+void* sortThreadFunc(void * param) {
+    while (true) {
+        pthread_mutex_lock(&sortFlagMutex);
+
+        while (!sortFlag)
+            pthread_cond_wait(&condVar, &sortFlagMutex);
+
+        pthread_mutex_lock(&listMutex);
+        sort(list);
+        pthread_mutex_unlock(&listMutex);
+        sortFlag = 0;
+        pthread_mutex_unlock(&sortFlagMutex);
+    }
+    
 }
 
-void bubbleSort(linkedList** head) {
-    linkedList** prevNode;
-    int swapped;
-    size_t size = listSize(head);
+void* alarmThreadFunc(void * param) {
+    while (true) {
+        sleep(DEFAULT_TIME_WAIT);
+        pthread_mutex_lock(&sortFlagMutex);
+        sortFlag = 1;
+        pthread_mutex_unlock(&sortFlagMutex);
+        pthread_cond_signal(&condVar);
+    }
+}
 
-    for (size_t i = 0; i <= size; i++) {
-        prevNode = head;
-        swapped = 0;
+void parentThreadFunc(pthread_t* alarmThread, pthread_t* sortThread) {
+    char userString[MAX_SRING_SIZE + 1] = {0};
 
-        for (size_t j = 0; j < size - i - 1; j++) {
-            linkedList* nextNode = (*prevNode) -> next;
+    while (true) {
+        fgets(userString, MAX_SRING_SIZE, stdin);
+        pthread_mutex_lock(&listMutex);
 
-            if (strcmp((*prevNode) -> val, nextNode -> val) > 0) {
-                swap(*prevNode, nextNode);
-                swapped = 1;
-            }
-
-            prevNode = &(nextNode -> next);
-        }
-
-        if (!swapped)
+        if (!strcmp("exit\n", userString)) {
+            pthread_cancel(*sortThread);
+            pthread_cancel(*alarmThread);
             break;
-    }
-}
-
-void initMutex() {
-    pthread_check(pthread_mutex_init(&mutex, NULL));
-}
-
-void printList(linkedList** head) {
-    lockMutex(*head);
-
-    printf("==================LIST====================\n");
-
-    for (linkedList* node = (*head); node; node = node -> next)
-        printf("%s\n", node -> val);
-
-    printf("=================END-LIST=================\n");
-
-    unlockMutex(*head);
-}
-
-void sortStop(linkedList* head, int res) {
-    returnFromThreads = 1;
-
-    if (!res) {
-        unlockMutex(head);
-        pthread_cancel(threadSorter);
-    }
-}
-
-void* threadHandler(void* data) {
-    linkedList** head = (linkedList**) data;
-
-    while (!returnFromThreads) {
-        pthread_check_with_list(*head, sleep(5));
-
-        lockMutex(*head);
-        printf("sorting...\n");
-
-        if (!(*head)) {
-            printf("empty list, skip...\n");
-            unlockMutex(*head);
-            continue;
         }
 
-        bubbleSort(head);
-        printf("end of sorting...\n");
-        unlockMutex(*head);
-    }
+        if (!strcmp("\n", userString)) {
+            printf("--------------LIST PRINTING------------\n");
+            printList(list);
+            printf("---------------------------------------\n");
+        } else
+            list = addStringNode(list, userString);
 
-    pthread_exit(data);
-}
-
-void createSorterThread(linkedList** head) {
-    initMutex();
-    pthread_check_with_list((*head), pthread_create(&threadSorter, NULL, threadHandler, (void *) head));
-}
-
-ssize_t promptLine(char* line, const int sizeLine) {
-    ssize_t n = 0;
-
-    while (true) {
-        n += read(0, (line + n), (size_t) (sizeLine - n));
-        *(line + n) = '\0';
-
-        return n;
+        pthread_mutex_unlock(&listMutex);
     }
 }
 
-void getStrings(linkedList** head) {
-    char buf[81];
-    ssize_t size;
+int main(int argc, char ** argv) {
+    pthread_t sortThread;
+    pthread_t alarmThread;
 
-    while (true) {
-        size = promptLine(buf, 80);
+    PCH(pthread_mutex_init(&listMutex, NULL));
+    PCH(pthread_mutex_init(&sortFlagMutex, NULL));
+    PCH(pthread_cond_init(&condVar, NULL));
+    PCH(pthread_create(&sortThread, NULL, sortThreadFunc, NULL));
+    PCH(pthread_create(&alarmThread, NULL, alarmThreadFunc, NULL));
 
-        if (!strcmp(buf, "exit\n") || !size) {
-            sortStop(*head, pthread_mutex_trylock(&mutex));
-            return;
-        } else if (!strcmp(buf, "\n"))
-            printList(head);
-        else {
-            for (int i = 0; i < strlen(buf); i++)
-                if (buf[i] == '\n')
-                    buf[i] = '\0';
+    parentThreadFunc(&alarmThread, &sortThread);
 
-            pushToList(head, buf);
-        }
-    }
-}
-
-int main() {
-    linkedList* head = NULL;
-    createSorterThread(&head);
-    getStrings(&head);
-    pthread_check_with_list(head, pthread_join(threadSorter, NULL));
-    pthread_check_with_list(head, pthread_mutex_destroy(&mutex));
-    freeList(head);
+    printf("-----------------FINISH----------------\n");
     pthread_exit(NULL);
     exit(EXIT_SUCCESS);
 }

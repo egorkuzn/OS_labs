@@ -10,7 +10,7 @@
 #include <string.h>
 #include <locale.h>
 
-#define pthread_check(a) pthreadFailureCheck(__LINE__, a, __FUNCTION__, __FILE__)
+#define PCH(a) pthreadFailureCheck(__LINE__, a, __FUNCTION__, __FILE__)
 #define COUNT_OF_ITERATIONS 5
 
 pthread_mutexattr_t attr;
@@ -30,9 +30,9 @@ void pthreadFailureCheck(const int line,\
 }
 
 void destroyMutex() {
-    pthread_check(pthread_mutex_destroy(&m1));
-    pthread_check(pthread_mutex_destroy(&m2));
-    pthread_check(pthread_mutex_destroy(&m3));
+    PCH(pthread_mutex_destroy(&m1));
+    PCH(pthread_mutex_destroy(&m2));
+    PCH(pthread_mutex_destroy(&m3));
 }
 
 void stop(char *errorMsg) {
@@ -54,7 +54,7 @@ void unlockMutex(pthread_mutex_t *m) {
 void initMutexes() {
     pthread_mutexattr_init(&attr);
 
-    pthread_check(pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK));
+    PCH(pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORPCH));
 
     if (pthread_mutex_init(&m1, &attr) ||
         pthread_mutex_init(&m2, &attr) ||
@@ -109,7 +109,7 @@ int main() {
     // Blocking for getting parent first:
     lockMutex(&m1);
     // Child thread creation:
-    pthread_check(pthread_create(&myThread, NULL, childPrint, NULL)); 
+    PCH(pthread_create(&myThread, NULL, childPrint, NULL)); 
     parentPrint();
 
     pthread_exit(NULL);    

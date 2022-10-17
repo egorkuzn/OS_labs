@@ -14,7 +14,7 @@
 #include <sys/wait.h>
 #include <semaphore.h>
 
-#define pthread_check(a) pthreadFailureCheck(__LINE__, a, __FUNCTION__, __FILE__)
+#define PCH(a) pthreadFailureCheck(__LINE__, a, __FUNCTION__, __FILE__)
 #define memory_check(a) memoryFailureCheck(__LINE__, a, __FUNCTION__, __FILE__)
 #define COUNT_OF_STRINGS 5
 
@@ -83,7 +83,7 @@ void printerSemInit(){
 
     for(u_char i = 0; i < 2; i++){ 
         printerSemArray[i] = (sem_t*)mmap(NULL, sizeof(sem_t), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-        pthread_check(sem_init(printerSemArray[i], 1, 1 - i));
+        PCH(sem_init(printerSemArray[i], 1, 1 - i));
         printf("%s semaphore inited\n", enumActor2Str[i]);
     }
 
@@ -98,8 +98,8 @@ void printerSemDestroy(int pid){
     if(WIFEXITED(status)){
         printf("\nSemaphore destruction as soon as child finished.\n");
 
-        pthread_check(sem_destroy(printerSemArray[0]));
-        pthread_check(sem_destroy(printerSemArray[1]));
+        PCH(sem_destroy(printerSemArray[0]));
+        PCH(sem_destroy(printerSemArray[1]));
 
         memory_check(munmap(printerSemArray[0], sizeof(sem_t)));
         memory_check(munmap(printerSemArray[1], sizeof(sem_t)));
