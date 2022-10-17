@@ -32,7 +32,7 @@ void pthreadFailureCheck(const int line,\
     }
 }
 
-linkedList* addStringNode(linkedList * head, char * string) {
+linkedList* addStringNode(linkedList* head, char* string) {
     linkedList* curHead = head;
     size_t strSize = strlen(string);
 
@@ -68,9 +68,9 @@ void sort(linkedList* head) {
 
     linkedList* left = head;                 
     linkedList* right = head -> next;          
-    linkedList* temp = (linkedList *)malloc(sizeof(linkedList));
+    linkedList* temp = (linkedList*) malloc(sizeof(linkedList));
 
-    temp -> str = (char *)calloc(MAX_SRING_SIZE + 1, sizeof(char));       
+    temp -> str = (char*) calloc(MAX_SRING_SIZE + 1, sizeof(char));       
 
     for (; left -> next; left = left -> next, right = left -> next)               
         for (; right; right = right -> next)
@@ -88,7 +88,7 @@ pthread_mutex_t sortFlagMutex;
 pthread_cond_t condVar;
 int sortFlag = 0;
 
-void* sortThreadFunc(void * param) {
+void* sortThreadFunc(void* param) {
     while (true) {
         pthread_mutex_lock(&sortFlagMutex);
 
@@ -104,7 +104,7 @@ void* sortThreadFunc(void * param) {
     
 }
 
-void* alarmThreadFunc(void * param) {
+void* alarmThreadFunc(void* param) {
     while (true) {
         sleep(DEFAULT_TIME_WAIT);
         pthread_mutex_lock(&sortFlagMutex);
@@ -138,7 +138,7 @@ void parentThreadFunc(pthread_t* alarmThread, pthread_t* sortThread) {
     }
 }
 
-int main(int argc, char ** argv) {
+int main(int argc, char** argv) {
     pthread_t sortThread;
     pthread_t alarmThread;
 
