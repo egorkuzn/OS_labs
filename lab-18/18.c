@@ -6,20 +6,23 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
+#include <stdbool.h>    
 #include <pthread.h>
 #include <string.h>
 #include <locale.h>
 #include <unistd.h>
+#include <signal.h>
+#include <stddef.h>
 
 #define PCH(a) pthreadFailureCheck(__LINE__, a, __FUNCTION__, __FILE__)
 #define MAX_SRING_SIZE 80
 #define DEFAULT_TIME_WAIT 5
 
-typedef struct linkedList {
+typedef struct linkedListM {
     char* str;
-    struct linkedList* next;
-} linkedList;
+    pthread_mutex_t mutex;
+    struct linkedListM* next;
+} linkedListM;
 
 void pthreadFailureCheck(const int line,\
                          const int code,\
@@ -32,14 +35,14 @@ void pthreadFailureCheck(const int line,\
     }
 }
 
-linkedList* addStringNode(linkedList* head, char* string) {
-    linkedList* curHead = head;
+linkedListM* addStringNode(linkedListM* head, char* string) {
+    linkedListM* curHead = head;
     size_t strSize = strlen(string);
 
     if (strSize > MAX_SRING_SIZE)
         curHead = addStringNode(curHead, string + MAX_SRING_SIZE);
 
-    linkedList* newHead = (linkedList*) malloc(sizeof(linkedList));
+    linkedListM* newHead = (linkedListM*) malloc(sizeof(linkedListM));
     newHead -> str = (char*)calloc(MAX_SRING_SIZE + 1, sizeof(char));
     strncpy(newHead -> str, string, strSize % (MAX_SRING_SIZE + 1));
     newHead -> next = curHead;
@@ -47,8 +50,8 @@ linkedList* addStringNode(linkedList* head, char* string) {
     return newHead;
 }
 
-void printList(linkedList* head) {
-    linkedList* cur = head;
+void printList(linkedListM* head) {
+    linkedListM* cur = head;
 
     while (cur != NULL) {
         printf("%s", cur->str);
@@ -56,19 +59,19 @@ void printList(linkedList* head) {
     }
 }
 
-void swap(linkedList* left, linkedList* right) {
+void swap(linkedListM* left, linkedListM* right) {
     char* temp = right -> str;
     right -> str = left -> str;
     left -> str = temp;
 }
 
-void sort(linkedList* head) {
+void sort(linkedListM* head) {
     if (head == NULL)
         return;
 
-    linkedList* left = head;                 
-    linkedList* right = head -> next;          
-    linkedList* temp = (linkedList*) malloc(sizeof(linkedList));
+    linkedListM* left = head;                 
+    linkedListM* right = head -> next;          
+    linkedListM* temp = (linkedListM*) malloc(sizeof(linkedListM));
 
     temp -> str = (char*) calloc(MAX_SRING_SIZE + 1, sizeof(char));       
 
@@ -82,26 +85,16 @@ void sort(linkedList* head) {
 }
 
 
-linkedList* list;
-pthread_mutex_t listMutex;
-pthread_mutex_t sortFlagMutex;
-pthread_cond_t condVar;
+linkedListM* list;
 int sortFlag = 0;
 
 void* sortThreadFunc(void* param) {
     while (true) {
-        pthread_mutex_lock(&sortFlagMutex);
-
-        while (!sortFlag)
-            pthread_cond_wait(&condVar, &sortFlagMutex);
-
-        pthread_mutex_lock(&listMutex);
-        sort(list);
-        pthread_mutex_unlock(&listMutex);
-        sortFlag = 0;
-        pthread_mutex_unlock(&sortFlagMutex);
-    }
-    
+        if(sortFlag){
+            sort(list);
+            sortFlag = 0;
+        }
+    }    
 }
 
 void* alarmThreadFunc(void* param) {
@@ -138,7 +131,15 @@ void parentThreadFunc(pthread_t* alarmThread, pthread_t* sortThread) {
     }
 }
 
+void setSortFlag(int signo) {
+    sortFlag = 1;
+    signal(SIGALRM, setSortFlag);
+    alarm(1);
+}
+
 int main(int argc, char ** argv) {
+    signal(SIGALRM, setSortFlag);
+
     pthread_t sortThread;
     pthread_t alarmThread;
 
@@ -148,6 +149,7 @@ int main(int argc, char ** argv) {
     PCH(pthread_create(&sortThread, NULL, sortThreadFunc, NULL));
     PCH(pthread_create(&alarmThread, NULL, alarmThreadFunc, NULL));
 
+    alarm(1);
     parentThreadFunc(&alarmThread, &sortThread);
 
     printf("-----------------FINISH----------------\n");
