@@ -39,7 +39,7 @@ void nodeStrSet(linkedList** node, linkedList* curHead, const char* string) {
     (*node) -> next = curHead;
 }
 
-linkedList* createNode(linkedList* curHead, const char* string){
+linkedList* createNode(linkedList* curHead, const char* string) {
     linkedList* node = (linkedList*) malloc(sizeof(linkedList));
     PCH(pthread_mutex_init(&(node->mutex), NULL));
     nodeStrSet(&node, curHead, string);
@@ -53,13 +53,13 @@ int swap(linkedList* left, linkedList* right) {
     return 1;
 }
 
-linkedList* addStringNode(linkedList* head, const char* string){
+linkedList* addStringNode(linkedList* head, const char* string) {
     linkedList* curHead = head;
     linkedList* newHead = createNode(curHead, string);
     return newHead;
 }
 
-void printList(linkedList* head){
+void printList(linkedList* head) {
     linkedList* cur = head;
     linkedList* prev;
 
@@ -139,13 +139,13 @@ bool sort(linkedList* head) {
 
 
 
-void setSortFlag(int signo){
+void setSortFlag(int signo) {
     sortFlag = true;
     signal(SIGALRM, setSortFlag);
     alarm(1);
 }
 
-void* sorterFunc(void* param){
+void* sorterFunc(void* param) {
     while (true)
         if (sortFlag)
             sortFlag = sort(list);
@@ -167,7 +167,7 @@ void parentThreadFunc(pthread_t* sortThread) {
     }
 }
 
-int main(int argc, char ** argv){
+int main(int argc, char ** argv) {
     signal(SIGALRM, setSortFlag);
     pthread_t sortThread;
     PCH(pthread_create(&sortThread, NULL, sorterFunc, NULL));
