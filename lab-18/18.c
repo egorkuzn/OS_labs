@@ -32,20 +32,24 @@ typedef struct linkedList{
 
 linkedList* list;
 
+void nodeStrSet(linkedList** node, linkedList* curHead, const char* string) {
+    size_t strSize = strlen(string);
+    (*node)->str = (char*)calloc(MAX_SRING_SIZE + 1, sizeof(char));
+    strncpy((*node)->str, string, strSize);
+    (*node)->next = curHead;
+}
+
 linkedList* createNode(linkedList* curHead, const char* string){
     linkedList* node = (linkedList*)malloc(sizeof(linkedList));
-    size_t strSize = strlen(string);
     PCH(pthread_mutex_init(&(node->mutex), NULL));
-    node->str = (char*)calloc(MAX_SRING_SIZE + 1, sizeof(char));
-    strncpy(node->str, string, strSize);
-    node->next = curHead;
+    nodeStrSet(&node, curHead, string);
     return node;
 }
 
 void swap(linkedList* left, linkedList* right){
     char* temp = right -> str;
     right -> str = left -> str;
-    left -> str = temp;
+    left  -> str = temp;
 }
 
 linkedList* addStringNode(linkedList* head, const char* string){
@@ -58,10 +62,10 @@ void printList(linkedList* head){
     linkedList* cur = head;
     linkedList* prev;
 
-    while (cur != NULL) {
+    while (cur) {
         printf("%s", cur->str);
         prev = cur;
-        cur = cur->next;
+        cur  = cur->next;
     }
 }
 
