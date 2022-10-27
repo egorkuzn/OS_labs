@@ -65,13 +65,13 @@ void pthreadCreationFailure(const int code, const char programName[]){
 }
 
 void printerSemInit(){
-    for(u_char i = 0; i < 2; i++) 
-        PCH(sem_init(&printerSemArray[i], 0, 1 - i));
+    PCH(sem_init(&printerSemArray[0], 0, 1));
+    PCH(sem_init(&printerSemArray[1], 0, 0));
 }
 
 void printerSemDestroy(){
-    for(u_char i = 0; i < 2; i++)
-        PCH(sem_destroy(&printerSemArray[i]));
+    PCH(sem_destroy(&printerSemArray[0]));
+    PCH(sem_destroy(&printerSemArray[1]));
 }
 
 int main(int argc, char *argv[]){
