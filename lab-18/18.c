@@ -22,7 +22,7 @@ void pthreadFailureCheck(const int line,\
 }
 
 pthread_mutex_t sortFlagMutex;
-int sortFlag = 0;
+bool sortFlag = false;
 
 typedef struct linkedList{
     char* str;
@@ -34,22 +34,23 @@ linkedList* list;
 
 void nodeStrSet(linkedList** node, linkedList* curHead, const char* string) {
     size_t strSize = strlen(string);
-    (*node)->str = (char*)calloc(MAX_SRING_SIZE + 1, sizeof(char));
-    strncpy((*node)->str, string, strSize);
-    (*node)->next = curHead;
+    (*node) -> str = (char*) calloc(MAX_SRING_SIZE + 1, sizeof(char));
+    strncpy((*node) -> str, string, strSize);
+    (*node) -> next = curHead;
 }
 
 linkedList* createNode(linkedList* curHead, const char* string){
-    linkedList* node = (linkedList*)malloc(sizeof(linkedList));
+    linkedList* node = (linkedList*) malloc(sizeof(linkedList));
     PCH(pthread_mutex_init(&(node->mutex), NULL));
     nodeStrSet(&node, curHead, string);
     return node;
 }
 
-void swap(linkedList* left, linkedList* right){
+int swap(linkedList* left, linkedList* right) {
     char* temp = right -> str;
     right -> str = left -> str;
     left  -> str = temp;
+    return 1;
 }
 
 linkedList* addStringNode(linkedList* head, const char* string){
@@ -107,9 +108,9 @@ void listIterator(linkedList** prevRight, linkedList** right, linkedList** left)
     *right = (*right) -> next;
 }
 
-void sort(linkedList* head) {
+bool sort(linkedList* head) {
     if (head == NULL)
-        return;
+        return true;
 
     nodeLock(head);
     linkedList* left      = head;
@@ -125,23 +126,21 @@ void sort(linkedList* head) {
         while (right) {
             nodePairLock(left, right);
 
-            if (strncmp(left -> str, right -> str, MAX_SRING_SIZE) > 0) {
-                swap(left, right);
-                flag = 1;
-            }
+            if (strncmp(left -> str, right -> str, MAX_SRING_SIZE) > 0)              
+                flag = swap(left, right);
 
             listIterator(&prevRight, &right, &left);
             nodePairUnLock(left, right);
         }
     } while (flag && sortIterator(&flag, &prevLeft, &left, &right, &nextLeft));
 
-    sortFlag = 0;
+    return false;
 }
 
 
 
 void setSortFlag(int signo){
-    sortFlag = 1;
+    sortFlag = true;
     signal(SIGALRM, setSortFlag);
     alarm(1);
 }
@@ -149,7 +148,7 @@ void setSortFlag(int signo){
 void* sorterFunc(void* param){
     while (true)
         if (sortFlag)
-            sort(list);
+            sortFlag = sort(list);
 }
 
 void parentThreadFunc(pthread_t* sortThread) {
