@@ -71,47 +71,67 @@ linkedList* sortIterator(int* flag,
                   linkedList** right,
                   linkedList** nextLeft) {
     *flag = 0;
-    *prevLeft = *left;
-    *left = (*left) -> next;
-    *right = (*left) -> next;
+    *prevLeft =  *left;
+    *left     = (*left) -> next;
+    *right    = (*left) -> next;
     *nextLeft = (*left) -> next; 
 
     return *nextLeft;
 }
 
 
-void sort(linkedList* head){
+int nodeLock(linkedList* node) {
+    return pthread_mutex_lock(&(node -> mutex));
+}
+
+int nodeUnLock(linkedList* node) {
+    return pthread_mutex_unlock(&(node -> mutex));
+}
+
+void nodePairLock(linkedList* left, linkedList* right) {
+    nodeLock(left);
+    nodeLock(right);
+}
+
+void nodePairUnLock(linkedList* left, linkedList* right) {
+    nodeUnLock(left);
+    nodeUnLock(right);
+}
+
+void listIterator(linkedList** prevRight, linkedList** right, linkedList** left) {
+    *prevRight = *right;
+    *right = (*right) -> next;
+}
+
+void sort(linkedList* head) {
     if (head == NULL)
         return;
 
-    pthread_mutex_lock(&(head->mutex));
-    linkedList* left = head;
-    linkedList* right = head->next;
-    linkedList* nextLeft = left->next;
-    linkedList* prevLeft = left;
+    nodeLock(head);
+    linkedList* left      = head;
+    linkedList* right     = head;
+    linkedList* nextLeft  = left -> next;
+    linkedList* prevLeft  = left;
     linkedList* prevRight = right;
-    pthread_mutex_unlock(&(head->mutex));
+    nodeUnLock(head);
     
     int flag = 0;
 
     do {
-        
         while (right) {
-            pthread_mutex_lock(&(left->mutex));
-            pthread_mutex_lock(&(right->mutex));
+            nodePairLock(left, right);
 
-            if (strncmp(left->str, right->str, MAX_SRING_SIZE) > 0) {
+            if (strncmp(left -> str, right -> str, MAX_SRING_SIZE) > 0) {
                 swap(left, right);
                 flag = 1;
             }
 
-            prevRight = right;
-            right = right->next;
-            pthread_mutex_unlock(&(left->mutex));
-            pthread_mutex_unlock(&(prevRight->mutex));
+            listIterator(&prevRight, &right, &left);
+            nodePairUnLock(left, right);
         }
+    } while (flag && sortIterator(&flag, &prevLeft, &left, &right, &nextLeft));
 
-   } while (flag && sortIterator(&flag, &prevLeft, &left, &right, &nextLeft));
+    sortFlag = 0;
 }
 
 
@@ -123,13 +143,9 @@ void setSortFlag(int signo){
 }
 
 void* sorterFunc(void* param){
-    while (true) {
-        if (sortFlag) {
+    while (true)
+        if (sortFlag)
             sort(list);
-            sortFlag = 0;
-        }
-    }
-
 }
 
 void parentThreadFunc(pthread_t* sortThread) {
