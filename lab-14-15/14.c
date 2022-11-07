@@ -5,10 +5,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
-#include <pthread.h>
 #include <string.h>
 #include <locale.h>
+#include <stdbool.h>
+#include <pthread.h>
 #include <semaphore.h>
 
 #define PCH(a) pthreadFailureCheck(__LINE__, a, __FUNCTION__, __FILE__)
@@ -65,8 +65,8 @@ void pthreadCreationFailure(const int code, const char programName[]){
 }
 
 void printerSemInit(){
-    PCH(sem_init(&printerSemArray[0], 0, 1));
-    PCH(sem_init(&printerSemArray[1], 0, 0));
+    PCH(sem_init(&printerSemArray[0], 0, 10));
+    PCH(sem_init(&printerSemArray[1], 0, 10));
 }
 
 void printerSemDestroy(){
@@ -79,7 +79,8 @@ int main(int argc, char *argv[]){
     // Semaphores initialization:
     printerSemInit();
     // Child thread creation:
-    PCH(pthread_create(&newThread, NULL, childPrint, NULL));   
+    PCH(pthread_create(&newThread, NULL, childPrint, NULL));
+    usleep(100);
     // Parent thread work: 
     parentPrint();
     pthread_exit(NULL);

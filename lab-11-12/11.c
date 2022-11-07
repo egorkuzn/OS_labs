@@ -3,6 +3,7 @@
 //Parent and child printing 10 strings.
 //Syncronized modification with using only mutexes.
 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -54,7 +55,7 @@ void unlockMutex(pthread_mutex_t *m) {
 void initMutexes() {
     pthread_mutexattr_init(&attr);
 
-    PCH(pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORPCH));
+    PCH(pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK));
 
     if (pthread_mutex_init(&m1, &attr) ||
         pthread_mutex_init(&m2, &attr) ||

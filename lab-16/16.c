@@ -38,11 +38,30 @@ void pthreadFailureCheck(const int line,\
     }
 }
 
+void segfaultSigaction(int signal, siginfo_t *si, void *arg) {
+    printf("Caught segfault at address %p :: mmap \n", si->si_addr);
+    exit(0);
+}
+
+void classic(int signal, siginfo_t *si, void *arg) {
+    printf("Sigmentation fault!\n");
+    exit(0);
+}
+
+void setSa(struct sigaction* sa, void* fun) { 
+    memset(sa, 0, sizeof(struct sigaction));
+    sigemptyset(&(sa -> sa_mask));
+    sa -> sa_sigaction = fun;
+    sa -> sa_flags = SA_SIGINFO;
+
+    sigaction(SIGSEGV, sa, NULL);
+}
+
 void memoryFailureCheck(const int line,\
                          const int code,\
                          const char function[],\
                          const char programName[]){
-    if(code){
+    if(code == -1){
         fprintf(stderr, "%s::%s()::%d mmap function: %s\n",\
          programName, function, line, strerror_l(code, LC_CTYPE));
         exit(EXIT_FAILURE);
@@ -75,15 +94,18 @@ void parentPrint(){
     printer(PARENT);
 } 
 
-void printerSemInit(){
+void printerSemInit(struct sigaction* sa){
+    //setSa(sa, segfaultSigaction);
+
     int fd;
 
     if ((fd = open("/dev/zero", O_RDWR)) < 0)
         fprintf(stderr, "Sem init failed\n");
 
     for(u_char i = 0; i < 2; i++){ 
-        printerSemArray[i] = (sem_t*)mmap(NULL, sizeof(sem_t), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-        PCH(sem_init(printerSemArray[i], 1, 1 - i));
+        printerSemArray[i] = NULL;//(sem_t*)mmap(NULL, sizeof(sem_t), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+        printf("HERE I AM!!!");
+        /*PCH(*/sem_init(printerSemArray[i], 1, 1 - i);//);
         printf("%s semaphore inited\n", enumActor2Str[i]);
     }
 
@@ -108,10 +130,12 @@ void printerSemDestroy(int pid){
 
 int main(int argc, char *argv[]){
     int pid;
+    struct sigaction sa;
     pthread_t newThread;
     // Semaphores initialization:
-    printerSemInit();
-
+    printerSemInit(&sa);
+    setSa(&sa, classic);
+    
     if((pid = fork()) < 0){
         // New proc creation fail exception:
         fprintf(stderr, "fork() exception\n");
