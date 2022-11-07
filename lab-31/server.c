@@ -18,6 +18,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <locale.h>
+#include <signal.h>
 #include <string.h>
 
 #define PCH(a) pthreadFailureCheck(__LINE__, a, __FUNCTION__, __FILE__)
@@ -33,9 +34,18 @@ void pthreadFailureCheck(const int line,\
     }
 }
 
-int main(int argc, char* argv[]) {
-    
-    pthread_exit(NULL);
+void ACH(int argc) {
+    if (argc != 3) {
+        printf("Invalid number of arguments");
+        exit(EXIT_FAILURE);
+    }
+}
 
+int main(int argc, char* argv[]) {
+    ACH(argc);
+    signal(SIGINT, getSignal());
+
+
+    pthread_exit(NULL);
     exit(EXIT_SUCCESS);
 }
