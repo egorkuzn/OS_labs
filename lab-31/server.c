@@ -20,6 +20,11 @@
 #include <locale.h>
 #include <signal.h>
 #include <string.h>
+#include <sys/socket.h>
+
+#define CACHE_SIZE 3
+#define COUNT_OF_USERS 10
+
 // Posix thread check
 #define PCH(a) pthreadFailureCheck(__LINE__, a, __FUNCTION__, __FILE__)
 
@@ -36,17 +41,18 @@ void pthreadFailureCheck(const int line,\
 // Argc param check
 void ACH(int argc) {
     if (argc != 3) {
-        printf("Invalid number of arguments");
+        printf("Invalid number of arguments\n");
         exit(EXIT_FAILURE);
     }
 }
 // Threads count check
-void TCH() {
-    
+void TCH(int countOfThreads) {
+    if (countOfThreads > COUNT_OF_USERS) {
+        printf("ERROR: Count of users must be less than %d\n", COUNT_OF_USERS);
+        exit(EXIT_FAILURE);
+    }
 }
-
-#define CACHE_SIZE 3
-
+// Cache for each page
 typedef struct cache_t {
     int pageSize;
     char* url;
@@ -54,15 +60,27 @@ typedef struct cache_t {
     pthread_mutex_t mutex;
     long lastTime;
 } cache_t;
+// Configuration which set by user
+typedef struct config_t {
+    int serverPort;
+    int countOfThreads
+} config_t;
 
 int listenFd;
 pthread_mutex_t cacheIndexMutex;
 pthread_mutex_t reallocMutex;
 cache_t* cache;
+config_t config;
 
 void getSignal(int signalNumber) {
     close(listenFd);
     exit(EXIT_FAILURE);
+}
+
+void getAllFromArgc(char* argv[]) {    
+    config.serverPort = atoi(argv[1]);
+    config.countOfThreads = atoi(argv[2]);
+    TCH(config.countOfThreads);
 }
 
 void initMutexFunction() {
@@ -71,23 +89,32 @@ void initMutexFunction() {
 
     cache = (cache_t*)calloc(CACHE_SIZE, sizeof(cache_t));
 
-    for(int i = 0; i < CACHE_SIZE; i++) {
+    for (int i = 0; i < CACHE_SIZE; i++) {
         pthread_mutex_init(&(cache[i].mutex), NULL);
         cache[i].lastTime = time(NULL);
     }
 }
 
+void creatingNewHandle() {
+    struct sockaddr_t servAddr;    
+}
+
+void initListenFd() {
+    listenFd = socket(AF_INET, SOCK_STREAM, 0);
+    shutdown(listenFd, 2);
+    creatingNewHandle();
+}
+
 void init (int argc, char* argv[]) {
     ACH(argc);
     signal(SIGINT, getSignal);
+    getConfigAllFromArgc(argv);
     initMutexFunction();
-    int serverPort = atoi(argv[1]);
-    int countOfThreads = atoi(argv[2]);
-    TCH(countOfThreads);
+    initListenFd();
 }
 
 int main(int argc, char* argv[]) {    
-    init();
+    init(argc, argv);
 
     pthread_exit(NULL);
     exit(EXIT_SUCCESS);
