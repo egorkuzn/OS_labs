@@ -20,7 +20,7 @@
 #include <locale.h>
 #include <signal.h>
 #include <string.h>
-
+// Posix thread check
 #define PCH(a) pthreadFailureCheck(__LINE__, a, __FUNCTION__, __FILE__)
 
 void pthreadFailureCheck(const int line,\
@@ -33,12 +33,16 @@ void pthreadFailureCheck(const int line,\
         exit(EXIT_FAILURE);
     }
 }
-
+// Argc param check
 void ACH(int argc) {
     if (argc != 3) {
         printf("Invalid number of arguments");
         exit(EXIT_FAILURE);
     }
+}
+// Threads count check
+void TCH() {
+    
 }
 
 #define CACHE_SIZE 3
@@ -73,11 +77,17 @@ void initMutexFunction() {
     }
 }
 
-int main(int argc, char* argv[]) {
+void init (int argc, char* argv[]) {
     ACH(argc);
     signal(SIGINT, getSignal);
     initMutexFunction();
+    int serverPort = atoi(argv[1]);
+    int countOfThreads = atoi(argv[2]);
+    TCH(countOfThreads);
+}
 
+int main(int argc, char* argv[]) {    
+    init();
 
     pthread_exit(NULL);
     exit(EXIT_SUCCESS);
