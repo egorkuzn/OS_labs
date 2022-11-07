@@ -123,9 +123,9 @@ void clientsEntitiesInit() {
 
     for (int i = 0; i < countWithoutThreads(); i++) {
         clients[i] = -1;
-        send
+        sentBytes[i] = -1;
+        cacheToClient[i] = -1;
         clientsHttpSockets[i] = -1;
-        
     }
 }
 /* Common init */
@@ -137,9 +137,18 @@ void init (int argc, char* argv[]) {
     initListenFd();
     clientsEntitiesInit();
 }
+/* Thread function for checking and clearing cache */
+void* checkingAndClearingCache(void* param) {
+
+}
 
 int main(int argc, char* argv[]) {    
     init(argc, argv);
+    pthread_t clearThread;
+    PCH(pthread_create(&clearThread, NULL, checkingAndClearingCache, NULL));
+    pthread_t* userThreads = (pthread_t*) calloc(config.countOfThreads, sizeof(pthread_t));
+    
+
 
     pthread_exit(NULL);
     exit(EXIT_SUCCESS);
