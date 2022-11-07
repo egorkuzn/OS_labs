@@ -59,6 +59,10 @@ pthread_mutex_t cacheIndexMutex; // Mutexes for each cache
 pthread_mutex_t reallocMutex; // Mutex for pages realloc moment
 cache_t* cache; // Cache which stores in RAM 
 config_t config; // Servers configuration set by user
+int* clients;
+int* sentBytes;
+int* cacheToClient;
+int* clientsHttpSockets;
 /* Sets listener close on exit */
 void getSignal(int signalNumber) {
     close(listenFd);
@@ -102,6 +106,28 @@ void initListenFd() {
     shutdown(listenFd, 2);
     creatingNewHandle();
 }
+/* Returns count of users that won't get thread */
+int countWithoutThreads() {
+    return COUNT_OF_USERS - config.countOfThreads;
+}
+/* Dynamic memory alloc block*/
+void commonClientsEntitiesAlloc() {
+    clients = (int*) calloc(countWithoutThreads(), sizeof(int));
+    sentBytes = (int*) calloc(countWithoutThreads(), sizeof(int));
+    cacheToClient = (int*) calloc(countWithoutThreads(), sizeof(int));
+    clientsHttpSockets = (int*) calloc(countWithoutThreads(), sizeof(int));
+}
+/* Init clients, clientsHttpSockets, cachToClient and sentBytes*/
+void clientsEntitiesInit() {
+    commonClientsEntitiesAlloc();
+
+    for (int i = 0; i < countWithoutThreads(); i++) {
+        clients[i] = -1;
+        send
+        clientsHttpSockets[i] = -1;
+        
+    }
+}
 /* Common init */
 void init (int argc, char* argv[]) {
     ACH(argc);
@@ -109,6 +135,7 @@ void init (int argc, char* argv[]) {
     getConfigAllFromArgc(argv);
     initMutexFunction();
     initListenFd();
+    clientsEntitiesInit();
 }
 
 int main(int argc, char* argv[]) {    
@@ -117,6 +144,19 @@ int main(int argc, char* argv[]) {
     pthread_exit(NULL);
     exit(EXIT_SUCCESS);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void pthreadFailureCheck(const int line,\
                          const int code,\
