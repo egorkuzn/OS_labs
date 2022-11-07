@@ -21,6 +21,8 @@
 #include <signal.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 #define CACHE_SIZE 3
 #define COUNT_OF_USERS 10
@@ -96,7 +98,7 @@ void initMutexFunction() {
 }
 
 void creatingNewHandle() {
-    struct sockaddr_t servAddr;    
+    struct sockaddr_in servAddr;    
 }
 
 void initListenFd() {
