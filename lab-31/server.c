@@ -41,9 +41,28 @@ void ACH(int argc) {
     }
 }
 
+int listenFd;
+
+void getSignal(int signalNumber) {
+    close(listenFd);
+    exit(EXIT_FAILURE);
+}
+
+void initMutexFunction() {
+    pthread_mutex_init(&cacheIndexMutex, NULL);
+    pthread_mutex_init(&reallocMutex, NULL);
+
+    cache = (cache_t*)calloc(CACHE_SIZE, sizeof(cache_t));
+
+    for(int i = 0; i < CACHE_SIZE; i++) {
+        pthread_mutex_init();
+    }
+}
+
 int main(int argc, char* argv[]) {
     ACH(argc);
-    signal(SIGINT, getSignal());
+    signal(SIGINT, getSignal);
+    initMutexFunction();
 
 
     pthread_exit(NULL);
