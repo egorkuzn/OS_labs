@@ -28,34 +28,19 @@
 #define CACHE_SIZE 3
 #define COUNT_OF_USERS 10
 
-// Posix thread check
 #define PCH(a) pthreadFailureCheck(__LINE__, a, __FUNCTION__, __FILE__)
-
+/* Posix thread check */
 void pthreadFailureCheck(const int line,\
                          const int code,\
                          const char function[],\
-                         const char programName[]) {
-    if (code) {
-        fprintf(stderr, "%s::%s()::%d pthread function: %s\n",\
-         programName, function, line, strerror_l(code, LC_CTYPE));
-        exit(EXIT_FAILURE);
-    }
-}
-// Argc param check
-void ACH(int argc) {
-    if (argc != 3) {
-        printf("Invalid number of arguments\n");
-        exit(EXIT_FAILURE);
-    }
-}
-// Threads count check
-void TCH(int countOfThreads) {
-    if (countOfThreads > COUNT_OF_USERS) {
-        printf("ERROR: Count of users must be less than %d\n", COUNT_OF_USERS);
-        exit(EXIT_FAILURE);
-    }
-}
-// Cache for each page
+                         const char programName[]);
+/* Argc param check */
+void ACH(int argc);
+/* Threads count check */
+void TCH(int countOfThreads);
+/* Listener's check */
+void FCH(int fd);
+/* Cache for each page */
 typedef struct cache_t {
     int pageSize;
     char* url;
@@ -63,29 +48,29 @@ typedef struct cache_t {
     pthread_mutex_t mutex;
     long lastTime;
 } cache_t;
-// Configuration which set by user
+/* Configuration which set by user */
 typedef struct config_t {
     int serverPort;
     int countOfThreads
 } config_t;
-
-int listenFd;
-pthread_mutex_t cacheIndexMutex;
-pthread_mutex_t reallocMutex;
-cache_t* cache;
-config_t config;
-
+/* Global params */
+int listenFd; // Listener's socket fd
+pthread_mutex_t cacheIndexMutex; // Mutexes for each cache
+pthread_mutex_t reallocMutex; // Mutex for pages realloc moment
+cache_t* cache; // Cache which stores in RAM 
+config_t config; // Servers configuration set by user
+/* Sets listener close on exit */
 void getSignal(int signalNumber) {
     close(listenFd);
     exit(EXIT_FAILURE);
 }
-
+/* Save all that we got from console */
 void getAllFromArgc(char* argv[]) {    
     config.serverPort = atoi(argv[1]);
     config.countOfThreads = atoi(argv[2]);
     TCH(config.countOfThreads);
 }
-
+/* Mutexes initialiser */
 void initMutexFunction() {
     pthread_mutex_init(&cacheIndexMutex, NULL);
     pthread_mutex_init(&reallocMutex, NULL);
@@ -97,17 +82,27 @@ void initMutexFunction() {
         cache[i].lastTime = time(NULL);
     }
 }
-
-void creatingNewHandle() {
-    struct sockaddr_in servAddr;    
+/* Sets net connection params */
+void setServAddr(struct sockaddr_in* servAddr) {
+    memset(servAddr, NULL, sizeof(struct sockaddr_in)); // clean it
+    /* set it fields: */
+    servAddr -> sin_family = AF_INET; // IP protocol family
+    servAddr -> sin_addr.s_addr = htonl(INADDR_ANY); // Set address to accept any incoming messages
+    servAddr -> sin_port = htons(config.serverPort); // Set port
 }
-
+/* Handle creation with listenFd check*/
+void creatingNewHandle() {
+    struct sockaddr_in servAddr; 
+    setServAddr(&servAddr);
+    FCH(listenFd);
+}
+/* Listener initialiser */
 void initListenFd() {
     listenFd = socket(AF_INET, SOCK_STREAM, 0);
     shutdown(listenFd, 2);
     creatingNewHandle();
 }
-
+/* Common init */
 void init (int argc, char* argv[]) {
     ACH(argc);
     signal(SIGINT, getSignal);
@@ -122,3 +117,36 @@ int main(int argc, char* argv[]) {
     pthread_exit(NULL);
     exit(EXIT_SUCCESS);
 }
+
+void pthreadFailureCheck(const int line,\
+                         const int code,\
+                         const char function[],\
+                         const char programName[]) {
+    if (code) {
+        fprintf(stderr, "%s::%s()::%d pthread function: %s\n",\
+         programName, function, line, strerror_l(code, LC_CTYPE));
+        exit(EXIT_FAILURE);
+    }
+}
+
+void ACH(int argc) {
+    if (argc != 3) {
+        printf("Invalid number of arguments\n");
+        exit(EXIT_FAILURE);
+    }
+}
+
+void TCH(int countOfThreads) {
+    if (countOfThreads > COUNT_OF_USERS) {
+        printf("ERROR: Count of users must be less than %d\n", COUNT_OF_USERS);
+        exit(EXIT_FAILURE);
+    }
+}
+
+void FCH(int fd) {
+    if (fd == -1)  {
+        printf("ERROR: Problem while socket opening\n");
+        exit(EXIT_FAILURE);
+    }
+}
+
