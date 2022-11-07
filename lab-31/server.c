@@ -23,8 +23,6 @@
 
 #define PCH(a) pthreadFailureCheck(__LINE__, a, __FUNCTION__, __FILE__)
 
-#define CACHE_SIZE 3
-
 void pthreadFailureCheck(const int line,\
                          const int code,\
                          const char function[],\
@@ -42,6 +40,16 @@ void ACH(int argc) {
         exit(EXIT_FAILURE);
     }
 }
+
+#define CACHE_SIZE 3
+
+typedef struct cache_t {
+    int pageSize;
+    char* url;
+    char* page;
+    pthread_mutex_t mutex;
+    long lastTime;
+} cache_t;
 
 int listenFd;
 pthread_mutex_t cacheIndexMutex;
