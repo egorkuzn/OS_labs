@@ -23,6 +23,8 @@
 
 #define PCH(a) pthreadFailureCheck(__LINE__, a, __FUNCTION__, __FILE__)
 
+#define CACHE_SIZE 3
+
 void pthreadFailureCheck(const int line,\
                          const int code,\
                          const char function[],\
@@ -42,6 +44,9 @@ void ACH(int argc) {
 }
 
 int listenFd;
+pthread_mutex_t cacheIndexMutex;
+pthread_mutex_t reallocMutex;
+cache_t* cache;
 
 void getSignal(int signalNumber) {
     close(listenFd);
@@ -55,7 +60,8 @@ void initMutexFunction() {
     cache = (cache_t*)calloc(CACHE_SIZE, sizeof(cache_t));
 
     for(int i = 0; i < CACHE_SIZE; i++) {
-        pthread_mutex_init();
+        pthread_mutex_init(&(cache[i].mutex), NULL);
+        cache[i].lastTime = time(NULL);
     }
 }
 
