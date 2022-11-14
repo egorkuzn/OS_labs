@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <sys/poll.h>
+#include <poll.h>
 #include <stdbool.h>
 
 #define CLIENTS_AMOUNT 510
