@@ -187,21 +187,14 @@ void poll_iterate() {
 }
 
 void server_fun() {
-    int ret;
     server.fds[MAX_FD_COUNT - 1].fd = server.listener;
     server.fds[MAX_FD_COUNT - 1].events = POLLIN;
 
-    while ((ret = poll(server.fds, MAX_FD_COUNT, TIMEOUT * 1000)) <= 0) {
+    while (poll(server.fds, MAX_FD_COUNT, TIMEOUT * 1000) != -1) {
         poll_iterate();        
     }
 
-    if (ret == 0) {
-        printf("Poll timed out.\n");
-    }
-
-    if (ret == -1) {
-        printf("Poll exception.\n");
-    }
+    printf("Poll exception.\n");
 }
 
 void sockaddr_init(struct sockaddr_in* ip_of_server) {
