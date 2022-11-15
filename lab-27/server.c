@@ -8,6 +8,7 @@
 
 #define MAX_FD_COUNT 1024 /* open files limit  */
 #define MAX_CLIENTS  510  /* connections limit */
+#define MAX_QUEUE    5    /* max queue process */
 #define BUFFER_SIZE  80   /* max message size  */ 
 #define TIMEOUT      1    /* in seconds        */
 #define PCH(a) poll_check(a, __FILE__, __FUNCTION__, __LINE__)
@@ -37,7 +38,7 @@ void poll_check(int poll_info,        \
     }
 }
 
-void fd_ckeck(int fd,               \
+void fd_check(int fd,               \
               const char progname[],\
               const char funname[], \
             int line                ) {
@@ -61,10 +62,18 @@ void get_argv(int argc, char* argv[]) {
     }
 }
 
+void add_new_client() {
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        if (server.live_clients_list[i]) {
+            
+        }
+    }
+}
+
 void listener_fun(int fd) {
     int new_client = accept(server.listener, (struct sockaddr*) NULL, NULL);
     FCH(new_client);
-    // TODO: add new client
+    add_new_client();
 }
 
 bool is_active_client() {
@@ -120,7 +129,7 @@ void server_init() {
     sockaddr_init(&ip_of_server);
     server.listener = socket(AF_INET, SOCK_STREAM, NULL);
     bind(server.listener, (struct sockaddr*) &ip_of_server, sizeof(ip_of_server));
-    listen(server.listener, MAX_CLIENTS);
+    listen(server.listener, MAX_QUEUE);
 
     server_clients_init();
 }
