@@ -2,12 +2,16 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <poll.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
 #include <stdbool.h>
 
 #define MAX_FD_COUNT 1024 /* open files limit  */
-#define MAX_USERS    510  /* connections limit */
+#define MAX_CLIENTS  510  /* connections limit */
+#define BUFFER_SIZE  80   /* max message size  */ 
 #define TIMEOUT      1    /* in seconds        */
 #define PCH(a) poll_check(a, __FILE__, __FUNCTION__, __LINE__)
+#define FCH(a) fd_check(a, __FILE__, __FUNCTION__, __LINE__)
 
 /* Structure for server params: */
 typedef struct {
@@ -17,7 +21,8 @@ typedef struct {
     int listener;     /* fd for clients listening */
     int node;         /* fd for node              */
     struct pollfd fds[MAX_FD_COUNT];
-    int  live_clients_list[MAX_USERS]
+    int  live_clients_list[MAX_CLIENTS];
+    char message_from_node[BUFFER_SIZE];
 } server_t;
 
 server_t server;
@@ -27,7 +32,18 @@ void poll_check(int poll_info,        \
                 const char funname[], \
                 int line                ) {
     if (poll_info == -1) {
-        perror("%s:%s:%d poll exception\n");
+        fprintf(stderr, "%s:%s:%d poll exception\n", progname, funname, line);
+        exit(EXIT_FAILURE);
+    }
+}
+
+void fd_ckeck(int fd,               \
+              const char progname[],\
+              const char funname[], \
+            int line                ) {
+    if (fd == -1) {
+        fprintf(stderr, "%s:%s:%d fd exception\n", progname, funname, line);
+        exit(EXIT_FAILURE);
     }
 }
 
@@ -46,11 +62,13 @@ void get_argv(int argc, char* argv[]) {
 }
 
 void listener_fun(int fd) {
-    
+    int new_client = accept(server.listener, (struct sockaddr*) NULL, NULL);
+    FCH(new_client);
+    // TODO: add new client
 }
 
 bool is_active_client() {
-    // пройтись по live_clients_list[], если есть, то живой
+    // TODO: пройтись по live_clients_list[], если есть, то живой
 }
 
 void node_client_fun(int i) {
@@ -86,7 +104,29 @@ void server_fun() {
     }    
 }
 
+void sock_addr_init(struct sockaddr_in* ip_of_server) {
+    memset(ip_of_server, NULL, sizeof(*ip_of_server));
+    ip_of_server -> sin_family = AF_INET;
+    ip_of_server -> sin_addr.s_addr = htonl(INADDR_ANY);
+    ip_of_server -> sin_port = htons(server.port_clients);
+}
+
+void server_clients_init() {
+    memset(server.live_clients_list, -1, sizeof(MAX_CLIENTS));
+}
+
+void server_init() {
+    struct sockaddr_in ip_of_server;
+    sockaddr_init(&ip_of_server);
+    server.listener = socket(AF_INET, SOCK_STREAM, NULL);
+    bind(server.listener, (struct sockaddr*) &ip_of_server, sizeof(ip_of_server));
+    listen(server.listener, MAX_CLIENTS);
+
+    server_clients_init();
+}
+
 int main(int argc, char* argv[]) {
     get_argv(argc, argv);
+    server_init();
     server_fun();
 }
