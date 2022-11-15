@@ -11,8 +11,7 @@
 #define MAX_QUEUE    5    /* max queue process */
 #define BUFFER_SIZE  80   /* max message size  */ 
 #define TIMEOUT      1    /* in seconds        */
-#define PCH(a) poll_check(a, __FILE__, __FUNCTION__, __LINE__)
-#define FCH(a) fd_check(a, __FILE__, __FUNCTION__, __LINE__)
+#define CH(a) check_fun(a, __FILE__, __FUNCTION__, __LINE__)
 
 /* Structure for server params: */
 typedef struct {
@@ -29,26 +28,14 @@ typedef struct {
 
 server_t server;
 
-void poll_check(int poll_info,        \
+void check_fun(int ret,              \
                 const char progname[],\
                 const char funname[], \
                 int line                ) {
-    if (poll_info == -1) {
-        fprintf(stderr, "%s:%s:%d poll exception\n", progname, funname, line);
+    if (ret == -1) {
+        fprintf(stderr, "%s:%s:%d exception\n", progname, funname, line);
         exit(EXIT_FAILURE);
     }
-}
-
-bool fd_check(int fd,               \
-              const char progname[],\
-              const char funname[], \
-              int line                ) {
-    if (fd == -1) {
-        fprintf(stderr, "%s:%s:%d fd exception\n", progname, funname, line);
-        return false;
-    }
-
-    return true;
 }
 
 void get_argv(int argc, char* argv[]) {
@@ -150,29 +137,30 @@ void server_fun() {
     server.fds[0].events = POLLIN;
 
     while (true) {
-        PCH(poll(server.fds, MAX_FD_COUNT, TIMEOUT * 1000));
+        CH(poll(server.fds, MAX_FD_COUNT, TIMEOUT * 1000));
         poll_iterate();        
     }    
 }
 
 void sock_addr_init(struct sockaddr_in* ip_of_server) {
     memset(ip_of_server, NULL, sizeof(*ip_of_server));
+    
     ip_of_server -> sin_family = AF_INET;
     ip_of_server -> sin_addr.s_addr = htonl(INADDR_ANY);
     ip_of_server -> sin_port = htons(server.port_clients);
 }
 
 void server_clients_init() {
-    memset(server.live_clients_list, -1, sizeof(MAX_CLIENTS));
+    memset(&server.clients, -1, MAX_CLIENTS * sizeof(int));
+    memset(&server.clients_translator, -1, MAX_CLIENTS * sizeof(int));
 }
 
 void server_init() {
     struct sockaddr_in ip_of_server;
     sockaddr_init(&ip_of_server);
     server.listener = socket(AF_INET, SOCK_STREAM, NULL);
-    bind(server.listener, (struct sockaddr*) &ip_of_server, sizeof(ip_of_server));
-    listen(server.listener, MAX_QUEUE);
-
+    CH(bind(server.listener, (struct sockaddr*) &ip_of_server, sizeof(ip_of_server)));
+    CH(listen(server.listener, MAX_QUEUE));
     server_clients_init();
 }
 
