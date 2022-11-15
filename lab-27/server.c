@@ -4,7 +4,6 @@
 #include <poll.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-#include <stdbool.h>
 #include <string.h>
 #include <assert.h>
 
@@ -21,11 +20,11 @@ typedef struct {
     int port_clients; /* where to listen          */
     char* ip_name;    /* address to translate     */
     int listener;     /* fd for clients listening */
-    ssize_t read_bytes;
-    int clients[MAX_CLIENTS];
-    int clients_translator[MAX_CLIENTS];
-    struct pollfd fds[MAX_FD_COUNT];
-    char messages[MAX_CLIENTS * 2][BUFFER_SIZE + 1];
+    ssize_t read_bytes;                              /* read bytes real amount      */
+    int clients[MAX_CLIENTS];                        /* clients sockets             */
+    int clients_translator[MAX_CLIENTS];             /* clients translators on node */
+    struct pollfd fds[MAX_FD_COUNT];                 /* fd array for poll           */
+    char messages[MAX_CLIENTS * 2][BUFFER_SIZE + 1]; /* all messages cashed         */
 } server_t;
 
 typedef enum{
@@ -41,7 +40,7 @@ void check_fun(int ret, const char program_name[], const char fun_name[], int li
         exit(EXIT_FAILURE);
     }
 }
-
+/* Getting info from console input: */
 void get_argv(int argc, char* argv[]) {
     if (argc == 4) {
         server.ip_name = argv[1];
@@ -55,18 +54,6 @@ void get_argv(int argc, char* argv[]) {
         printf("Don't worry, just try again.\n");
         exit(EXIT_FAILURE);
     }
-}
-
-int add_new_client(int new_client) {
-    for(int i = 0; i < MAX_FD_COUNT; i++) {
-        if (server.fds[i].fd == -1) {
-            server.fds[i].fd = new_client;
-            server.fds[i].events = POLLIN | POLLOUT;
-            return i;
-        }
-    }
-
-    return -1;
 }
 
 int find_new_client_index() {
@@ -116,7 +103,7 @@ int create_new_node_connect(int new_client_index) {
     return server.clients_translator[new_client_index];
 }
 
-void listener_fun(int fd) {
+void listener_fun() {
     int new_client_index = find_new_client_index();
     
     if (new_client_index == -1) {
@@ -142,6 +129,14 @@ void disconnect(int i) {
     server.clients_translator[_] = -1;
 }
 
+char* message_to_send(int i) {
+    if (i >= MAX_CLIENTS) {
+        return server.messages[i - MAX_CLIENTS];
+    } else {
+        return server.messages[i + MAX_CLIENTS];
+    }
+}
+
 void client_fun(int i, client_mode_t mode) {
     if (i >= MAX_CLIENTS * 2) {
         printf("Reader out of bounds\n");
@@ -150,11 +145,13 @@ void client_fun(int i, client_mode_t mode) {
 
     switch (mode) {
         case READ:
-            memset(server.messages[i], NULL, sizeof(BUFFER_SIZE));
+            memset(server.messages[i], NULL, BUFFER_SIZE);
             server.read_bytes = read(server.fds[i].fd, server.messages[i], BUFFER_SIZE);
             break;
         case WRITE:
-            server.read_bytes = write(server.fds[i].fd, server.messages[i], BUFFER_SIZE);
+            server.read_bytes = write(server.fds[i].fd, message_to_send(i), BUFFER_SIZE);
+            break;
+        default:
             break;
     }
 
@@ -172,11 +169,10 @@ void poll_iterate() {
         }
 
         if (server.fds[i].revents & POLLIN) {
-            switch (i) {
-                case MAX_FD_COUNT - 1:
-                    listener_fun(i);
-                default:
-                    client_fun(i, READ);
+            if (i == MAX_FD_COUNT - 1) {
+                listener_fun();
+            } else {
+                client_fun(i, READ);
             }
         }
 
@@ -187,13 +183,21 @@ void poll_iterate() {
 }
 
 void server_fun() {
+    int ret;
     server.fds[MAX_FD_COUNT - 1].fd = server.listener;
     server.fds[MAX_FD_COUNT - 1].events = POLLIN;
 
-    while (true) {
-        CH(poll(server.fds, MAX_FD_COUNT, TIMEOUT * 1000));
+    while ((ret = poll(server.fds, MAX_FD_COUNT, TIMEOUT * 1000)) <= 0) {
         poll_iterate();        
-    }    
+    }
+
+    if (ret == 0) {
+        printf("Poll timed out.\n");
+    }
+
+    if (ret == -1) {
+        printf("Poll exception.\n");
+    }
 }
 
 void sockaddr_init(struct sockaddr_in* ip_of_server) {
@@ -220,8 +224,6 @@ void server_init() {
 
 void TEST() {
     assert(MAX_CLIENTS * 2 < MAX_FD_COUNT - 1);
-    printf("All tests passed");
-    printf("----------------");
 }
 
 int main(int argc, char* argv[]) {
