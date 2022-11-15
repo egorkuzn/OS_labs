@@ -6,6 +6,7 @@
 #include <arpa/inet.h>
 #include <stdbool.h>
 #include <string.h>
+#include <assert.h>
 
 #define MAX_FD_COUNT 1024 /* open files limit  */
 #define MAX_CLIENTS  510  /* connections limit */
@@ -21,11 +22,16 @@ typedef struct {
     char* ip_name;    /* address to translate     */
     int listener;     /* fd for clients listening */
     ssize_t read_bytes;
-    char message[BUFFER_SIZE + 1];
     int clients[MAX_CLIENTS];
     int clients_translator[MAX_CLIENTS];
     struct pollfd fds[MAX_FD_COUNT];
+    char messages[MAX_CLIENTS * 2][BUFFER_SIZE + 1];
 } server_t;
+
+typedef enum{
+    READ,
+    WRITE
+} client_mode_t;
 
 server_t server;
 
@@ -46,6 +52,7 @@ void get_argv(int argc, char* argv[]) {
         printf("* Node address name;\n");
         printf("* Port for node;\n");
         printf("* Port for clients.\n");
+        printf("Don't worry, just try again.\n");
         exit(EXIT_FAILURE);
     }
 }
@@ -126,45 +133,62 @@ void listener_fun(int fd) {
 }
 
 void disconnect(int i) {
-
+    int _ = i % MAX_CLIENTS;
+    close(server.fds[_].fd);
+    close(server.fds[_ + MAX_CLIENTS].fd);
+    server.fds[_].fd = -1;
+    server.fds[_ + MAX_CLIENTS].fd = -1;
+    server.clients[_] = -1;
+    server.clients_translator[_] = -1;
 }
 
-void client_fun(int i) {
-    if (read(server.fds[i].fd, server.message, BUFFER_SIZE) <= 0) {
-        disconnect(i);
+void client_fun(int i, client_mode_t mode) {
+    if (i >= MAX_CLIENTS * 2) {
+        printf("Reader out of bounds\n");
+        return;
     }
-}
 
-void node_fun(int i) {
-    if (read(server.fds[i].fd, server.message, BUFFER_SIZE) <= 0) {
-        disconnect(i);
+    switch (mode) {
+        case READ:
+            memset(server.messages[i], NULL, sizeof(BUFFER_SIZE));
+            server.read_bytes = read(server.fds[i].fd, server.messages[i], BUFFER_SIZE);
+            break;
+        case WRITE:
+            server.read_bytes = write(server.fds[i].fd, server.messages[i], BUFFER_SIZE);
+            break;
     }
-}
 
-void node_client_fun(int i) {
-    if (i < MAX_CLIENTS) {
-        client_fun(i);
+    if (server.read_bytes <= 0) {
+        disconnect(i);
     } else {
-        node_fun(i);
+        server.messages[i][server.read_bytes] = '\0';
     }
 }
 
 void poll_iterate() {
     for (int i = 0; i < MAX_FD_COUNT; i++) {
+        if (server.fds[i].fd == -1) {
+            continue;
+        }
+
         if (server.fds[i].revents & POLLIN) {
             switch (i) {
                 case MAX_FD_COUNT - 1:
                     listener_fun(i);
                 default:
-                    node_client_fun(i);
+                    client_fun(i, READ);
             }
+        }
+
+        if (server.fds[i].revents & POLLOUT) {
+            client_fun(i, WRITE);
         }
     }
 }
 
 void server_fun() {
-    server.fds[0].fd = server.listener;
-    server.fds[0].events = POLLIN;
+    server.fds[MAX_FD_COUNT - 1].fd = server.listener;
+    server.fds[MAX_FD_COUNT - 1].events = POLLIN;
 
     while (true) {
         CH(poll(server.fds, MAX_FD_COUNT, TIMEOUT * 1000));
@@ -194,7 +218,14 @@ void server_init() {
     server_clients_init();
 }
 
+void TEST() {
+    assert(MAX_CLIENTS * 2 < MAX_FD_COUNT - 1);
+    printf("All tests passed");
+    printf("----------------");
+}
+
 int main(int argc, char* argv[]) {
+    TEST();
     get_argv(argc, argv);
     server_init();
     server_fun();
