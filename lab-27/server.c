@@ -39,14 +39,16 @@ void poll_check(int poll_info,        \
     }
 }
 
-void fd_check(int fd,               \
+bool fd_check(int fd,               \
               const char progname[],\
               const char funname[], \
-            int line                ) {
+              int line                ) {
     if (fd == -1) {
         fprintf(stderr, "%s:%s:%d fd exception\n", progname, funname, line);
-        exit(EXIT_FAILURE);
+        return false;
     }
+
+    return true;
 }
 
 void get_argv(int argc, char* argv[]) {
@@ -76,15 +78,44 @@ int add_new_client(int new_client) {
 }
 
 int find_new_client_index() {
-    // TODO: write new client index finder;
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        if (server.clients[i] == -1) {
+            return i;
+        }
+    }
 
-    return 1;
+    return -1;
 }
 
-void listener_fun(int fd) {
-    int new_client_index = find_new_client_index();
+int accept_new_client(int new_client_index) {
     server.clients[new_client_index] = accept(server.listener, (struct sockaddr*) NULL, NULL);
+    return server.clients[new_client_index];
+}
 
+int create_new_node_connect(int new_client_index) {
+    struct sockaddr_in client_addr;
+    memset(&client_addr, 0, sizeof(client_addr));
+    client_addr.sin_family = AF_INET;
+
+    if () {
+
+    }
+}
+
+bool listener_fun(int fd) {
+    int new_client_index = find_new_client_index();
+    
+    if (new_client_index == -1) {
+        return false; /* Failed connection try */
+    }
+    /* Successful connection try */
+    if (!FCH(accept_new_client(new_client_index))) {
+        return false;
+    }
+
+    if (!FCH(create_new_node_connect(new_client_index))) {
+        return false;
+    }
 }
 
 bool is_active_client() {
