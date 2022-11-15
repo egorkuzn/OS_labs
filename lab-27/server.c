@@ -5,6 +5,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <stdbool.h>
+#include <string.h>
 
 #define MAX_FD_COUNT 1024 /* open files limit  */
 #define MAX_CLIENTS  510  /* connections limit */
@@ -19,8 +20,8 @@ typedef struct {
     int port_clients; /* where to listen          */
     char* ip_name;    /* address to translate     */
     int listener;     /* fd for clients listening */
-    int node;         /* fd for node              */
-    char message_from_node[BUFFER_SIZE];
+    ssize_t read_bytes;
+    char message[BUFFER_SIZE + 1];
     int clients[MAX_CLIENTS];
     int clients_translator[MAX_CLIENTS];
     struct pollfd fds[MAX_FD_COUNT];
@@ -28,12 +29,9 @@ typedef struct {
 
 server_t server;
 
-void check_fun(int ret,              \
-                const char progname[],\
-                const char funname[], \
-                int line                ) {
+void check_fun(int ret, const char program_name[], const char fun_name[], int line) {
     if (ret == -1) {
-        fprintf(stderr, "%s:%s:%d exception\n", progname, funname, line);
+        fprintf(stderr, "%s:%s:%d exception\n", program_name, fun_name, line);
         exit(EXIT_FAILURE);
     }
 }
@@ -76,6 +74,12 @@ int find_new_client_index() {
 
 int accept_new_client(int new_client_index) {
     server.clients[new_client_index] = accept(server.listener, (struct sockaddr*) NULL, NULL);
+
+    if (server.clients[new_client_index] != -1) {
+        server.fds[new_client_index].fd = server.clients[new_client_index];
+        server.fds[new_client_index].events = POLLIN | POLLOUT;
+    }
+
     return server.clients[new_client_index];
 }
 
@@ -84,50 +88,76 @@ int create_new_node_connect(int new_client_index) {
     memset(&client_addr, 0, sizeof(client_addr));
     client_addr.sin_family = AF_INET;
 
-    if () {
-
+    if (inet_pton(AF_INET, server.ip_name, &client_addr.sin_addr) <= 0) {
+        printf("\n inet_pton() error\n");
+        exit(EXIT_FAILURE);
     }
+
+    do {
+        close(server.clients_translator[new_client_index]);
+        server.clients_translator[new_client_index] = socket(AF_INET, SOCK_STREAM, 0);
+        client_addr.sin_port = htons(server.port_node);
+    } while (connect(server.clients_translator[new_client_index], (struct sockaddr*) &client_addr, sizeof(client_addr)) != 0);
+
+    printf("Translate %d to %d\n", new_client_index, server.clients_translator[new_client_index]);
+
+    if (server.clients_translator[new_client_index] != -1) {
+        server.fds[new_client_index + MAX_CLIENTS].fd = server.clients_translator[new_client_index];
+        server.fds[new_client_index + MAX_CLIENTS].events = POLLIN | POLLOUT;
+    }
+
+    return server.clients_translator[new_client_index];
 }
 
-bool listener_fun(int fd) {
+void listener_fun(int fd) {
     int new_client_index = find_new_client_index();
     
     if (new_client_index == -1) {
-        return false; /* Failed connection try */
+        return; /* Failed connection try */
     }
     /* Successful connection try */
-    if (!FCH(accept_new_client(new_client_index))) {
-        return false;
+    if (accept_new_client(new_client_index) == -1) {
+        return;
     }
 
-    if (!FCH(create_new_node_connect(new_client_index))) {
-        return false;
+    if (create_new_node_connect(new_client_index) == -1) {
+        return;
     }
 }
 
-bool is_active_client() {
-    // TODO: пройтись по live_clients_list[], если есть, то живой
+void disconnect(int i) {
+
+}
+
+void client_fun(int i) {
+    if (read(server.fds[i].fd, server.message, BUFFER_SIZE) <= 0) {
+        disconnect(i);
+    }
+}
+
+void node_fun(int i) {
+    if (read(server.fds[i].fd, server.message, BUFFER_SIZE) <= 0) {
+        disconnect(i);
+    }
 }
 
 void node_client_fun(int i) {
-    if (server.fds[i].fd == server.node) {
-        node_fun();
-    } else if (is_active_client(server.fds[i].fd)) {
-        client_fun();
+    if (i < MAX_CLIENTS) {
+        client_fun(i);
+    } else {
+        node_fun(i);
     }
 }
 
 void poll_iterate() {
     for (int i = 0; i < MAX_FD_COUNT; i++) {
-        switch (server.fds[i].events) {
-            case POLLIN:
-                listener_fun(i);
-                break;
-            case POLLIN | POLLOUT:
-                node_client_fun(i);
-                break;
-            default:
-                break;
+        if (server.fds[i].revents & POLLIN) {
+            switch (i) {
+                case MAX_FD_COUNT - 1:
+                    listener_fun(i);
+                default:
+                    node_client_fun(i);
+            }
         }
     }
 }
@@ -142,7 +172,7 @@ void server_fun() {
     }    
 }
 
-void sock_addr_init(struct sockaddr_in* ip_of_server) {
+void sockaddr_init(struct sockaddr_in* ip_of_server) {
     memset(ip_of_server, NULL, sizeof(*ip_of_server));
     
     ip_of_server -> sin_family = AF_INET;
