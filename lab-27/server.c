@@ -137,12 +137,7 @@ char* message_to_send(int i) {
     }
 }
 
-void client_fun(int i, client_mode_t mode) {
-    if (i >= MAX_CLIENTS * 2) {
-        printf("Reader out of bounds\n");
-        return;
-    }
-
+void client_fun_switch(int i, client_mode_t mode) {
     switch (mode) {
         case READ:
             memset(server.messages[i], NULL, BUFFER_SIZE);
@@ -154,6 +149,15 @@ void client_fun(int i, client_mode_t mode) {
         default:
             break;
     }
+}
+
+void client_fun(int i, client_mode_t mode) {
+    if (i >= MAX_CLIENTS * 2) {
+        printf("Reader out of bounds\n");
+        return;
+    }
+
+    client_fun_switch(i, mode);
 
     if (server.read_bytes <= 0) {
         disconnect(i);
