@@ -21,9 +21,10 @@ typedef struct {
     char* ip_name;    /* address to translate     */
     int listener;     /* fd for clients listening */
     int node;         /* fd for node              */
-    struct pollfd fds[MAX_FD_COUNT];
-    int  live_clients_list[MAX_CLIENTS];
     char message_from_node[BUFFER_SIZE];
+    int clients[MAX_CLIENTS];
+    int clients_translator[MAX_CLIENTS];
+    struct pollfd fds[MAX_FD_COUNT];
 } server_t;
 
 server_t server;
@@ -62,18 +63,28 @@ void get_argv(int argc, char* argv[]) {
     }
 }
 
-void add_new_client() {
-    for (int i = 0; i < MAX_CLIENTS; i++) {
-        if (server.live_clients_list[i]) {
-            
+int add_new_client(int new_client) {
+    for(int i = 0; i < MAX_FD_COUNT; i++) {
+        if (server.fds[i].fd == -1) {
+            server.fds[i].fd = new_client;
+            server.fds[i].events = POLLIN | POLLOUT;
+            return i;
         }
     }
+
+    return -1;
+}
+
+int find_new_client_index() {
+    // TODO: write new client index finder;
+
+    return 1;
 }
 
 void listener_fun(int fd) {
-    int new_client = accept(server.listener, (struct sockaddr*) NULL, NULL);
-    FCH(new_client);
-    add_new_client();
+    int new_client_index = find_new_client_index();
+    server.clients[new_client_index] = accept(server.listener, (struct sockaddr*) NULL, NULL);
+
 }
 
 bool is_active_client() {
