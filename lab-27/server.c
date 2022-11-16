@@ -10,7 +10,7 @@
 #define MAX_FD_COUNT 1024 /* open files limit  */
 #define MAX_CLIENTS  510  /* connections limit */
 #define MAX_QUEUE    5    /* max queue process */
-#define BUFFER_SIZE  80   /* max message size  */ 
+#define BUFFER_SIZE  80   /* max client_message size  */
 #define TIMEOUT      1    /* in seconds        */
 #define CH(a) check_fun(a, __FILE__, __FUNCTION__, __LINE__)
 
@@ -24,7 +24,7 @@ typedef struct {
     int clients[MAX_CLIENTS];                        /* clients sockets             */
     int clients_translator[MAX_CLIENTS];             /* clients translators on server */
     struct pollfd fds[MAX_FD_COUNT];                 /* fd array for poll           */
-    char messages[MAX_CLIENTS * 2][BUFFER_SIZE + 1]; /* all messages cashed         */
+    char messages[MAX_CLIENTS * 2][BUFFER_SIZE + 1]; /* all client_message cashed         */
 } server_t;
 
 typedef enum{

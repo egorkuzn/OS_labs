@@ -5,7 +5,6 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <string.h>
-#include <assert.h>
 
 #define MAX_FD_COUNT 1024 /* open files limit  */
 #define MAX_CLIENTS  510  /* connections limit */
@@ -16,12 +15,13 @@
 
 /* Structure for server params: */
 typedef struct {
-    int port_server;  /* server port            */
-    int listener;     /* fd for clients listening */
-    ssize_t read_bytes;                              /* read bytes real amount        */
-    int clients_translator[MAX_CLIENTS];             /* clients translators on server */
-    struct pollfd fds[MAX_FD_COUNT];                 /* fd array for poll             */
-    char messages[MAX_CLIENTS + 1][BUFFER_SIZE + 1]; /* all messages cashed           */
+    int port_server;                         /* server port                   */
+    int listener;                            /* fd for clients listening      */
+    ssize_t read_bytes;                      /* read bytes real amount        */
+    int clients_translator[MAX_CLIENTS];     /* clients translators on server */
+    struct pollfd fds[MAX_FD_COUNT];         /* fd array for poll             */
+    char client_message[BUFFER_SIZE + 1];    /* client message buffer         */
+    char broadcast_message[BUFFER_SIZE + 1]; /* broadcast notification        */
 } node_t;
 
 typedef enum{
@@ -51,7 +51,7 @@ void get_argv(int argc, char* argv[]) {
 
 int find_new_client_index() {
     for (int i = 0; i < MAX_CLIENTS; i++) {
-        if (server.clients[i] == -1) {
+        if (node.clients_translator[i] == -1) {
             return i;
         }
     }
@@ -65,32 +65,6 @@ int accept_new_client(int new_client_index) {
     if (node.clients_translator[new_client_index] != -1) {
         node.fds[new_client_index].fd = node.clients_translator[new_client_index];
         node.fds[new_client_index].events = POLLIN | POLLOUT;
-    }
-
-    return node.clients_translator[new_client_index];
-}
-
-int create_new_node_connect(int new_client_index) {
-    struct sockaddr_in client_addr;
-    memset(&client_addr, 0, sizeof(client_addr));
-    client_addr.sin_family = AF_INET;
-
-    if (inet_pton(AF_INET, node.ip_name, &client_addr.sin_addr) <= 0) {
-        printf("\n inet_pton() error\n");
-        exit(EXIT_FAILURE);
-    }
-
-    do {
-        close(node.clients_translator[new_client_index]);
-        node.clients_translator[new_client_index] = socket(AF_INET, SOCK_STREAM, 0);
-        client_addr.sin_port = htons(node.port_node);
-    } while (connect(node.clients_translator[new_client_index], (struct sockaddr*) &client_addr, sizeof(client_addr)) != 0);
-
-    printf("Translate %d to %d\n", new_client_index, node.clients_translator[new_client_index]);
-
-    if (node.clients_translator[new_client_index] != -1) {
-        node.fds[new_client_index + MAX_CLIENTS].fd = node.clients_translator[new_client_index];
-        node.fds[new_client_index + MAX_CLIENTS].events = POLLIN | POLLOUT;
     }
 
     return node.clients_translator[new_client_index];
@@ -115,14 +89,14 @@ void disconnect(int i) {
     node.clients_translator[_] = -1;
 }
 
-void client_fun_switch(int i, client_mode_t mode) {
+void client_fun_io(int i, client_mode_t mode) {
     switch (mode) {
         case READ:
-            memset(node.messages[i], NULL, BUFFER_SIZE);
-            node.read_bytes = read(node.fds[i].fd, node.messages[i], BUFFER_SIZE);
+            memset(node.client_message, NULL, BUFFER_SIZE);
+            node.read_bytes = read(node.fds[i].fd, node.client_message, BUFFER_SIZE);
             break;
         case WRITE:
-            node.read_bytes = write(node.fds[i].fd, node.messages[MAX_CLIENTS], BUFFER_SIZE);
+            node.read_bytes = write(node.fds[i].fd, node.broadcast_message, BUFFER_SIZE);
             break;
         default:
             break;
@@ -135,17 +109,20 @@ void client_fun(int i, client_mode_t mode) {
         return;
     }
 
-    client_fun_switch(i, mode);
+    client_fun_io(i, mode);
 
     if (node.read_bytes <= 0) {
         disconnect(i);
-    } else {
-        node.messages[i][node.read_bytes] = '\0';
+    } else if (mode == READ) {
+        node.client_message[node.read_bytes] = '\0';
+        printf("client$%d > %s\n", i, node.client_message);
     }
 }
 
 void broadcast_fun() {
-    read(STDIN_FILENO, node.messages[MAX_CLIENTS], BUFFER_SIZE);
+    node.read_bytes = read(STDIN_FILENO, node.broadcast_message, BUFFER_SIZE);
+    CH(node.read_bytes);
+    node.broadcast_message[node.read_bytes] = '\0';
 }
 
 void poll_iterate() {
@@ -156,7 +133,7 @@ void poll_iterate() {
 
         if (node.fds[i].revents & POLLIN) {
             switch (i) {
-                case MAX_FD_COUNT - 1 :
+                case MAX_FD_COUNT - 1:
                     listener_fun();
                     break;
                 case MAX_FD_COUNT - 2:
