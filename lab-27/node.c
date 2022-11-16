@@ -95,7 +95,7 @@ void client_fun_io(int i, client_mode_t mode) {
             node.read_bytes = read(node.fds[i].fd, node.client_message, BUFFER_SIZE);
             break;
         case WRITE:
-            node.read_bytes = write(node.fds[i].fd, node.broadcast_message, BUFFER_SIZE);
+            node.read_bytes = write(node.fds[i].fd, node.broadcast_message, strlen(node.broadcast_message));
             break;
         default:
             break;
@@ -108,13 +108,14 @@ void client_fun(int i, client_mode_t mode) {
         return;
     }
 
+    node.read_bytes = 0;
     client_fun_io(i, mode);
 
     if (node.read_bytes <= 0) {
         disconnect(i);
     } else if (mode == READ) {
         node.client_message[node.read_bytes] = '\0';
-        printf("client$%d > %s\n", i, node.client_message);
+        printf("client$%d$%zd > %s\n", i, node.read_bytes, node.client_message);
     }
 }
 

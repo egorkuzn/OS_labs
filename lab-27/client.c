@@ -16,8 +16,8 @@ typedef struct {
     char* ip_name;               /* server ip address      */
     ssize_t read_bytes;          /* read bytes real amount */
     struct pollfd fds[2];        /* fd array for poll      */
-    char message_to_send[BUFFER_SIZE];
-    char message_to_receive[BUFFER_SIZE];
+    char message_to_send[BUFFER_SIZE + 1];
+    char message_to_receive[BUFFER_SIZE + 1];
 } client_t;
 
 typedef enum{
@@ -55,7 +55,7 @@ void socket_fun(client_mode_t mode) {
             client.read_bytes = read(client.fds[0].fd, client.message_to_receive, BUFFER_SIZE);
             break;
         case WRITE:
-            client.read_bytes = write(client.fds[0].fd, client.message_to_send, BUFFER_SIZE);
+            client.read_bytes = write(client.fds[0].fd, client.message_to_send, strlen(client.message_to_send));
             break;
         default:
             break;
@@ -63,12 +63,19 @@ void socket_fun(client_mode_t mode) {
 
     CH(client.read_bytes);
 
-    if (mode == READ && client.read_bytes > 0) {
-        printf("Get from server > %s\n", client.message_to_receive);
+    if (client.read_bytes == 0) {
+        printf("Connection close\n");
     }
+
+    client.message_to_receive[BUFFER_SIZE] = '\0';
+    printf("Get from server > %s\n", client.message_to_receive);
 }
 
-
+void console_reader_fun() {
+    client.read_bytes = read(client.fds[1].fd, client.message_to_send, BUFFER_SIZE);
+    CH(client.read_bytes);
+    client.message_to_send[BUFFER_SIZE] = '\0';
+}
 
 void poll_iterate() {
         if (client.fds[0].revents & POLLIN) {
