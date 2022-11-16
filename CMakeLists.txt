@@ -4,4 +4,5 @@ project(OS_labs)
 set(CMAKE_CXX_STANDARD 11)
 
 add_executable(OS_labs
-        lab-27/server.c)
+        lab-27/server.c
+        lab-27/node.c)
