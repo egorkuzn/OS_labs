@@ -49,7 +49,7 @@ void get_argv(int argc, char* argv[]) {
     } else {
         printf("Expected:\n");
         printf("* Node address name;\n");
-        printf("* Port for server;\n");
+        printf("* Port for node;\n");
         printf("* Port for clients.\n");
         printf("Don't worry, just try again.\n");
         exit(EXIT_FAILURE);

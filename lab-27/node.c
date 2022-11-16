@@ -43,7 +43,7 @@ void get_argv(int argc, char* argv[]) {
         node.port_server = atoi(argv[1]);
     } else {
         printf("Expected:\n");
-        printf("* Server port;\n");
+        printf("* Server port.\n");
         printf("Don't worry, just try again.\n");
         exit(EXIT_FAILURE);
     }
@@ -83,10 +83,9 @@ void listener_fun() {
 }
 
 void disconnect(int i) {
-    int _ = i % MAX_CLIENTS;
-    close(node.fds[_].fd);
-    node.fds[_].fd = -1;
-    node.clients_translator[_] = -1;
+    close(node.fds[i].fd);
+    node.fds[i].fd = -1;
+    node.clients_translator[i] = -1;
 }
 
 void client_fun_io(int i, client_mode_t mode) {
