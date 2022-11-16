@@ -14,17 +14,14 @@
 #define TIMEOUT      1    /* in seconds        */
 #define CH(a) check_fun(a, __FILE__, __FUNCTION__, __LINE__)
 
-/* Structure for node params: */
+/* Structure for server params: */
 typedef struct {
-    int port_node;    /* where to translate       */
-    int port_clients; /* where to listen          */
-    char* ip_name;    /* address to translate     */
+    int port_server;  /* server port            */
     int listener;     /* fd for clients listening */
-    ssize_t read_bytes;                              /* read bytes real amount      */
-    int clients[MAX_CLIENTS];                        /* clients sockets             */
-    int clients_translator[MAX_CLIENTS];             /* clients translators on node */
-    struct pollfd fds[MAX_FD_COUNT];                 /* fd array for poll           */
-    char messages[MAX_CLIENTS * 2][BUFFER_SIZE + 1]; /* all messages cashed         */
+    ssize_t read_bytes;                              /* read bytes real amount        */
+    int clients_translator[MAX_CLIENTS];             /* clients translators on server */
+    struct pollfd fds[MAX_FD_COUNT];                 /* fd array for poll             */
+    char messages[MAX_CLIENTS + 1][BUFFER_SIZE + 1]; /* all messages cashed           */
 } node_t;
 
 typedef enum{
@@ -42,15 +39,11 @@ void check_fun(int ret, const char program_name[], const char fun_name[], int li
 }
 /* Getting info from console input: */
 void get_argv(int argc, char* argv[]) {
-    if (argc == 4) {
-        node.ip_name = argv[1];
-        node.port_node = atoi(argv[2]);
-        node.port_clients = atoi(argv[1]);
+    if (argc == 2) {
+        node.port_server = atoi(argv[1]);
     } else {
         printf("Expected:\n");
-        printf("* Node address name;\n");
-        printf("* Port for node;\n");
-        printf("* Port for clients.\n");
+        printf("* Server port;\n");
         printf("Don't worry, just try again.\n");
         exit(EXIT_FAILURE);
     }
@@ -58,7 +51,7 @@ void get_argv(int argc, char* argv[]) {
 
 int find_new_client_index() {
     for (int i = 0; i < MAX_CLIENTS; i++) {
-        if (node.clients[i] == -1) {
+        if (server.clients[i] == -1) {
             return i;
         }
     }
@@ -67,14 +60,14 @@ int find_new_client_index() {
 }
 
 int accept_new_client(int new_client_index) {
-    node.clients[new_client_index] = accept(node.listener, (struct sockaddr*) NULL, NULL);
+    node.clients_translator[new_client_index] = accept(node.listener, (struct sockaddr*) NULL, NULL);
 
-    if (node.clients[new_client_index] != -1) {
-        node.fds[new_client_index].fd = node.clients[new_client_index];
+    if (node.clients_translator[new_client_index] != -1) {
+        node.fds[new_client_index].fd = node.clients_translator[new_client_index];
         node.fds[new_client_index].events = POLLIN | POLLOUT;
     }
 
-    return node.clients[new_client_index];
+    return node.clients_translator[new_client_index];
 }
 
 int create_new_node_connect(int new_client_index) {
@@ -113,28 +106,13 @@ void listener_fun() {
     if (accept_new_client(new_client_index) == -1) {
         return;
     }
-
-    if (create_new_node_connect(new_client_index) == -1) {
-        return;
-    }
 }
 
 void disconnect(int i) {
     int _ = i % MAX_CLIENTS;
     close(node.fds[_].fd);
-    close(node.fds[_ + MAX_CLIENTS].fd);
     node.fds[_].fd = -1;
-    node.fds[_ + MAX_CLIENTS].fd = -1;
-    node.clients[_] = -1;
     node.clients_translator[_] = -1;
-}
-
-char* message_to_send(int i) {
-    if (i >= MAX_CLIENTS) {
-        return node.messages[i - MAX_CLIENTS];
-    } else {
-        return node.messages[i + MAX_CLIENTS];
-    }
 }
 
 void client_fun_switch(int i, client_mode_t mode) {
@@ -144,7 +122,7 @@ void client_fun_switch(int i, client_mode_t mode) {
             node.read_bytes = read(node.fds[i].fd, node.messages[i], BUFFER_SIZE);
             break;
         case WRITE:
-            node.read_bytes = write(node.fds[i].fd, message_to_send(i), BUFFER_SIZE);
+            node.read_bytes = write(node.fds[i].fd, node.messages[MAX_CLIENTS], BUFFER_SIZE);
             break;
         default:
             break;
@@ -166,6 +144,10 @@ void client_fun(int i, client_mode_t mode) {
     }
 }
 
+void broadcast_fun() {
+    read(STDIN_FILENO, node.messages[MAX_CLIENTS], BUFFER_SIZE);
+}
+
 void poll_iterate() {
     for (int i = 0; i < MAX_FD_COUNT; i++) {
         if (node.fds[i].fd == -1) {
@@ -173,10 +155,16 @@ void poll_iterate() {
         }
 
         if (node.fds[i].revents & POLLIN) {
-            if (i == MAX_FD_COUNT - 1) {
-                listener_fun();
-            } else {
-                client_fun(i, READ);
+            switch (i) {
+                case MAX_FD_COUNT - 1 :
+                    listener_fun();
+                    break;
+                case MAX_FD_COUNT - 2:
+                    broadcast_fun();
+                    break;
+                default:
+                    client_fun(i, READ);
+                    break;
             }
         }
 
@@ -186,9 +174,20 @@ void poll_iterate() {
     }
 }
 
-void server_fun() {
+void init_poll() {
+    for (int i = 0; i < MAX_FD_COUNT; i++) {
+        node.fds[i].fd = -1;
+    }
+}
+
+void node_fun() {
+    init_poll();
+
     node.fds[MAX_FD_COUNT - 1].fd = node.listener;
     node.fds[MAX_FD_COUNT - 1].events = POLLIN;
+
+    node.fds[MAX_FD_COUNT - 2].fd = STDIN_FILENO;
+    node.fds[MAX_FD_COUNT - 2].events = POLLIN;
 
     while (poll(node.fds, MAX_FD_COUNT, TIMEOUT * 1000) != -1) {
         poll_iterate();
@@ -197,30 +196,29 @@ void server_fun() {
     printf("Poll exception.\n");
 }
 
-void sockaddr_init(struct sockaddr_in* ip_of_server) {
-    memset(ip_of_server, NULL, sizeof(*ip_of_server));
+void sockaddr_init(struct sockaddr_in* ip_of_node) {
+    memset(ip_of_node, NULL, sizeof(*ip_of_node));
 
-    ip_of_server -> sin_family = AF_INET;
-    ip_of_server -> sin_addr.s_addr = htonl(INADDR_ANY);
-    ip_of_server -> sin_port = htons(node.port_clients);
+    ip_of_node -> sin_family = AF_INET;
+    ip_of_node -> sin_addr.s_addr = htonl(INADDR_ANY);
+    ip_of_node -> sin_port = htons(node.port_server);
 }
 
-void server_clients_init() {
-    memset(&node.clients, -1, MAX_CLIENTS * sizeof(int));
+void node_clients_init() {
     memset(&node.clients_translator, -1, MAX_CLIENTS * sizeof(int));
 }
 
-void server_init() {
-    struct sockaddr_in ip_of_server;
-    sockaddr_init(&ip_of_server);
+void node_init() {
+    struct sockaddr_in ip_of_node;
+    sockaddr_init(&ip_of_node);
     node.listener = socket(AF_INET, SOCK_STREAM, NULL);
-    CH(bind(node.listener, (struct sockaddr*) &ip_of_server, sizeof(ip_of_server)));
+    CH(bind(node.listener, (struct sockaddr*) &ip_of_node, sizeof(ip_of_node)));
     CH(listen(node.listener, MAX_QUEUE));
-    server_clients_init();
+    node_clients_init();
 }
 
 int main(int argc, char* argv[]) {
     get_argv(argc, argv);
-    server_init();
-    server_fun();
+    node_init();
+    node_fun();
 }
