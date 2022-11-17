@@ -55,7 +55,8 @@ void socket_fun(client_mode_t mode) {
             client.read_bytes = read(client.fds[0].fd, client.message_to_receive, BUFFER_SIZE);
             break;
         case WRITE:
-            client.read_bytes = write(client.fds[0].fd, client.message_to_send, strlen(client.message_to_send));
+            scanf("%s", client.message_to_send);
+            client.read_bytes = write(client.fds[0].fd, client.message_to_send, sizeof (client.message_to_send));
             break;
         default:
             break;
@@ -78,23 +79,23 @@ void console_reader_fun() {
 }
 
 void poll_iterate() {
-        if (client.fds[0].revents & POLLIN) {
-            socket_fun(READ);
-        }
+    if (client.fds[0].revents & POLLIN) {
+        socket_fun(READ);
+        printf("Read from socket fished.\n");
+    }
 
-        if (client.fds[0].revents & POLLOUT) {
-            socket_fun(WRITE);
-        }
-
-        if (client.fds[1].revents & POLLIN) {
-            console_reader_fun();
-        }
+    if (client.fds[0].revents & POLLOUT) {
+        socket_fun(WRITE);
+        printf("Write in socket fished.\n");
+    }
 }
 
 void init_poll() {
     for (int i = 0; i < 2; i++) {
         client.fds[i].fd = -1;
     }
+
+    printf("Poll inited\n");
 }
 
 void client_fun() {
@@ -102,8 +103,13 @@ void client_fun() {
 
     client.fds[1].fd = STDIN_FILENO;
     client.fds[1].events = POLLIN;
+    int ret;
 
-    while (poll(client.fds, 2, TIMEOUT * 1000) != -1) {
+    while ((ret = poll(client.fds, 2, TIMEOUT * 1000)) != -1) {
+        if(ret == 0) {
+            printf("TIMEOUT\n");
+        }
+
         poll_iterate();
     }
 
@@ -120,15 +126,19 @@ void client_init() {
         exit(EXIT_FAILURE);
     }
 
-    do {
-        close(client.fds[0].fd);
-        client.fds[0].fd = socket(AF_INET, SOCK_STREAM, 0);
-        client_addr.sin_port = htons(client.port_server);
-    } while (connect(client.fds[0].fd, (struct sockaddr*) &client_addr, sizeof(client_addr)) != 0);
+    close(client.fds[0].fd);
+    client.fds[0].fd = socket(AF_INET, SOCK_STREAM, 0);
+    client_addr.sin_port = htons(client.port_server);
+
+    if(connect(client.fds[0].fd, (struct sockaddr*) &client_addr, sizeof(client_addr)) != 0) {
+        printf("Connection is failed: server is down.\n");
+        printf("Start server or reboot if it works.\n");
+        exit(EXIT_FAILURE);
+    }
 
     CH(client.fds[0].fd);
     client.fds[0].events = POLLIN | POLLOUT;
-    printf("Client connected to the server.\n");
+    printf("Client successfully connected to the server.\n");
 }
 
 int main(int argc, char* argv[]) {

@@ -144,7 +144,7 @@ void client_fun_switch(int i, client_mode_t mode) {
             server.read_bytes = read(server.fds[i].fd, server.messages[i], BUFFER_SIZE);
             break;
         case WRITE:
-            server.read_bytes = write(server.fds[i].fd, message_to_send(i), strlen(message_to_send(i)));
+            server.read_bytes = write(server.fds[i].fd, message_to_send(i), sizeof (message_to_send(i)));
             break;
         default:
             break;

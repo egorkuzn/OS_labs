@@ -95,7 +95,7 @@ void client_fun_io(int i, client_mode_t mode) {
             node.read_bytes = read(node.fds[i].fd, node.client_message, BUFFER_SIZE);
             break;
         case WRITE:
-            node.read_bytes = write(node.fds[i].fd, node.broadcast_message, strlen(node.broadcast_message));
+            node.read_bytes = write(node.fds[i].fd, node.broadcast_message, sizeof (node.broadcast_message));
             break;
         default:
             break;
@@ -136,9 +136,6 @@ void poll_iterate() {
                 case MAX_FD_COUNT - 1:
                     listener_fun();
                     break;
-                case MAX_FD_COUNT - 2:
-                    broadcast_fun();
-                    break;
                 default:
                     client_fun(i, READ);
                     break;
@@ -162,9 +159,6 @@ void node_fun() {
 
     node.fds[MAX_FD_COUNT - 1].fd = node.listener;
     node.fds[MAX_FD_COUNT - 1].events = POLLIN;
-
-    node.fds[MAX_FD_COUNT - 2].fd = STDIN_FILENO;
-    node.fds[MAX_FD_COUNT - 2].events = POLLIN;
 
     while (poll(node.fds, MAX_FD_COUNT, TIMEOUT * 1000) != -1) {
         poll_iterate();
