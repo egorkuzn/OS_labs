@@ -5,6 +5,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <string.h>
+#include <time.h>
 
 #define MAX_FD_COUNT 1024 /* open files limit  */
 #define MAX_CLIENTS  510  /* connections limit */
@@ -19,6 +20,7 @@ typedef struct {
     int listener;                            /* fd for clients listening      */
     ssize_t read_bytes;                      /* read bytes real amount        */
     int clients_translator[MAX_CLIENTS];     /* clients translators on server */
+    time_t last_update_time;                 /* time of last update           */
     struct pollfd fds[MAX_FD_COUNT];         /* fd array for poll             */
     char client_message[BUFFER_SIZE + 1];    /* client message buffer         */
     char broadcast_message[BUFFER_SIZE + 1]; /* broadcast notification        */
@@ -89,6 +91,10 @@ void disconnect(int i) {
     printf("Client %d$ DISCONNECTED\n", i);
 }
 
+int time_from_last_update() {
+    return (int) (difftime(time(NULL), node.last_update_time) / CLOCKS_PER_SEC);
+}
+
 void client_fun_io(int i, client_mode_t mode) {
     switch (mode) {
         case READ:
@@ -96,7 +102,11 @@ void client_fun_io(int i, client_mode_t mode) {
             node.read_bytes = read(node.fds[i].fd, node.client_message, BUFFER_SIZE);
             break;
         case WRITE:
-            node.read_bytes = write(node.fds[i].fd, node.broadcast_message, BUFFER_SIZE);
+//            if (time_from_last_update() >= 1) {
+                node.read_bytes = write(node.fds[i].fd, node.broadcast_message, BUFFER_SIZE);
+                node.last_update_time = time(NULL);
+//            }
+
             break;
         default:
             break;
@@ -116,6 +126,7 @@ void client_fun(int i, client_mode_t mode) {
     } else if (mode == READ) {
         node.client_message[node.read_bytes] = '\0';
         printf("Client %d$ > %s\n", i, node.client_message);
+        memset(node.client_message, NULL, BUFFER_SIZE);
     }
 }
 
@@ -161,7 +172,7 @@ void node_fun() {
     node.fds[MAX_FD_COUNT - 1].fd = node.listener;
     node.fds[MAX_FD_COUNT - 1].events = POLLIN;
 
-    while (poll(node.fds, MAX_FD_COUNT, TIMEOUT * 1000) != -1) {
+    while (poll(node.fds, MAX_FD_COUNT, TIMEOUT * 10000) != -1) {
         poll_iterate();
     }
 

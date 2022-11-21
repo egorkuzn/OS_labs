@@ -11,7 +11,7 @@
 #define MAX_CLIENTS  510  /* connections limit */
 #define MAX_QUEUE    5    /* max queue process */
 #define BUFFER_SIZE  80   /* max client_message size  */
-#define TIMEOUT      1    /* in seconds        */
+#define TIMEOUT      10   /* in seconds        */
 #define CH(a) check_fun(a, __FILE__, __FUNCTION__, __LINE__)
 
 /* Structure for server params: */
@@ -151,7 +151,11 @@ void client_fun_switch(int i, client_mode_t mode) {
             server.read_bytes = read(server.fds[i].fd, server.messages[i], BUFFER_SIZE);
             break;
         case WRITE:
-            server.read_bytes = write(server.fds[i].fd, /*"clieeeent here\n\0"*/message_to_send(i), BUFFER_SIZE);
+            if (message_to_send(i)[0] != '\0') {
+                server.read_bytes = write(server.fds[i].fd, message_to_send(i), BUFFER_SIZE);
+                memset(message_to_send(i), NULL, BUFFER_SIZE);
+            }
+
             break;
         default:
             break;

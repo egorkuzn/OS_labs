@@ -5,9 +5,10 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <string.h>
+#include <time.h>
 
 #define BUFFER_SIZE  80   /* max message size  */
-#define TIMEOUT      1    /* in seconds        */
+#define TIMEOUT      10   /* in seconds        */
 #define CH(a) check_fun(a, __FILE__, __FUNCTION__, __LINE__)
 
 /* Structure for server params: */
@@ -15,6 +16,7 @@ typedef struct {
     int port_server;             /* server port            */
     char* ip_name;               /* server ip address      */
     ssize_t read_bytes;          /* read bytes real amount */
+    time_t last_update_time;     /* time of last update    */
     struct pollfd fds[1];        /* fd array for poll      */
     char message_to_send[BUFFER_SIZE + 1];
     char message_to_receive[BUFFER_SIZE + 1];
@@ -47,6 +49,15 @@ void get_argv(int argc, char* argv[]) {
     }
 }
 
+int time_from_last_update() {
+    return (int) (difftime(time(NULL), client.last_update_time) / CLOCKS_PER_SEC);
+}
+
+void disconnect() {
+    printf("Client$ DISCONNECTED\n");
+    exit(EXIT_SUCCESS);
+}
+
 void socket_fun(client_mode_t mode) {
     CH(client.fds[0].fd);
 
@@ -55,7 +66,11 @@ void socket_fun(client_mode_t mode) {
             client.read_bytes = read(client.fds[0].fd, client.message_to_receive, BUFFER_SIZE);
             break;
         case WRITE:
-            client.read_bytes = write(client.fds[0].fd, client.message_to_send, BUFFER_SIZE);
+            if (time_from_last_update() >= 1) {
+                client.read_bytes = write(client.fds[0].fd, client.message_to_send, BUFFER_SIZE);
+                client.last_update_time = time(NULL);
+            }
+
             break;
         default:
             break;
@@ -65,10 +80,14 @@ void socket_fun(client_mode_t mode) {
 
     if (client.read_bytes == 0) {
         printf("Connection close\n");
+        disconnect();
     }
 
     client.message_to_receive[BUFFER_SIZE] = '\0';
-    printf("Get from server > %s\n", client.message_to_receive);
+
+    if (mode == READ) {
+        printf("Get from server > %s\n", client.message_to_receive);
+    }
 }
 
 void poll_iterate() {
@@ -91,13 +110,9 @@ void client_fun() {
     int ret;
 
     while ((ret = poll(client.fds, 1, TIMEOUT * 1000)) != -1) {
-        CH(client.fds[0].fd);
-
         if(ret == 0) {
             printf("TIMEOUT\n");
         }
-
-        CH(client.fds[0].fd);
 
         poll_iterate();
     }
