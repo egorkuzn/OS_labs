@@ -1,137 +1,155 @@
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <netdb.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <errno.h>
+#include <poll.h>
+#include <sys/socket.h>
 #include <arpa/inet.h>
-#include <signal.h>
-#include <stdbool.h>
+#include <string.h>
+#include <time.h>
 
-#define TIMEOUT_S 1
-#define BUFFER_SIZE 1024
-int sockFd = 0;
-/* Socket config: */
+#define BUFFER_SIZE  80   /* max message size  */
+#define TIMEOUT      10   /* in seconds        */
+#define CH(a) check_fun(a, __FILE__, __FUNCTION__, __LINE__)
+
+/* Structure for server params: */
 typedef struct {
-    int port;
-    char* ipAddrName;
-    struct sockaddr_in sockAddrIn;
-} config_t;
-/* Structure for working with select: */
-typedef struct {
-    int readBytes;
-    fd_set sfds;
-    fd_set inds;
-    struct timeval timeout;
-    char recvBuff[BUFFER_SIZE];
-} select_config_t;
+    int port_server;             /* server port            */
+    char* ip_name;               /* server ip address      */
+    ssize_t read_bytes;          /* read bytes real amount */
+    time_t last_update_time;     /* time of last update    */
+    struct pollfd fds[1];        /* fd array for poll      */
+    char message_to_send[BUFFER_SIZE + 1];
+    char message_to_receive[BUFFER_SIZE + 1];
+} client_t;
 
-config_t client;
-select_config_t setting = {
-    .readBytes = 0,
-    .recvBuff = {0},
-    .timeout = {
-        .tv_sec = TIMEOUT_S,
-        .tv_usec = 0
-    }
-};
+typedef enum{
+    READ,
+    WRITE
+} client_mode_t;
 
-void createFunction() {
-    if ((sockFd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        printf("\n Error : Could not create socket \n");
-        exit(EXIT_FAILURE);
-    }
+client_t client;
 
-    client.sockAddrIn.sin_family = AF_INET;
-    client.sockAddrIn.sin_port = htons(client.port);
-
-    if (inet_pton(AF_INET, client.ipAddrName, &client.sockAddrIn.sin_addr) <= 0) {
-        printf("Cant parse address=%s\n", client.ipAddrName);
-        exit(EXIT_FAILURE);
-    }
-
-    if (connect(sockFd, (struct sockaddr*) &client.sockAddrIn, sizeof(client.sockAddrIn)) < 0) {
-        printf("Connect failed\n");
+void check_fun(int ret, const char program_name[], const char fun_name[], int line) {
+    if (ret == -1) {
+        fprintf(stderr, "%s:%s:%d exception\n", program_name, fun_name, line);
         exit(EXIT_FAILURE);
     }
 }
-
-void getConfig(int argc, char* argv[]) {
+/* Getting info from console input: */
+void get_argv(int argc, char* argv[]) {
     if (argc == 3) {
-        client.ipAddrName = argv[1];
-        client.port = atoi(argv[2]);
-        createFunction();
+        client.ip_name = argv[1];
+        client.port_server = atoi(argv[2]);
     } else {
-        printf("Invalid number of arguments\n"); 
         printf("Expected:\n");
-        printf("* IP address;\n");
-        printf("* Port number.\n");
-        printf("Try again, please.\n");
+        printf("* Server address name;\n");
+        printf("* Port for server.\n");
+        printf("Don't worry, just try again.\n");
         exit(EXIT_FAILURE);
     }
 }
 
-void selectBegin() {
-    FD_ZERO(&setting.sfds);
-	FD_SET(sockFd, &setting.sfds);
-	FD_ZERO(&setting.inds);
-	FD_SET(STDIN_FILENO, &setting.inds);
+int time_from_last_update() {
+    return (int) (difftime(time(NULL), client.last_update_time) / CLOCKS_PER_SEC);
 }
 
-void receive(int select_socket) {
-    if(select_socket) {
-		if ((setting.readBytes = read(sockFd, setting.recvBuff, sizeof(setting.recvBuff) - 1)) > 0) {
-			setting.recvBuff[setting.readBytes] = 0;
-                
-			if(fputs(setting.recvBuff, stdout) == EOF) {
-					printf("Puts error\n");
-			}
-		}
-	}
+void disconnect() {
+    printf("Client$ DISCONNECTED\n");
+    exit(EXIT_SUCCESS);
 }
 
-bool submit(int send_socket) {
-    if (send_socket) {
-		if ((setting.readBytes = read(STDIN_FILENO, setting.recvBuff, BUFFER_SIZE - 1)) > 0) {
-			setting.recvBuff[setting.readBytes - 1] = 0;
-            write(sockFd, setting.recvBuff, setting.readBytes);
+void socket_fun(client_mode_t mode) {
+    CH(client.fds[0].fd);
 
-			if (strcmp("/EXIT", setting.recvBuff) == 0) {
-				close(sockFd);
-				return false;
-			}
-		}
-	}
-
-    return true;
-}
-
-void clientFunction() {
-    while (true) {
-        selectBegin();
-
-        if (errno != 0) {
-			close(sockFd);
-			break;
-		}
-
-		receive(select(sockFd + 1, &setting.sfds, NULL, NULL, &setting.timeout));
-
-        if(!submit(select(STDIN_FILENO + 1, &setting.inds, NULL, NULL, &setting.timeout))) {
+    switch (mode) {
+        case READ:
+            client.read_bytes = read(client.fds[0].fd, client.message_to_receive, BUFFER_SIZE);
             break;
-        }		
-	}
+        case WRITE:
+            if (time_from_last_update() >= 1) {
+                client.read_bytes = write(client.fds[0].fd, client.message_to_send, BUFFER_SIZE);
+                client.last_update_time = time(NULL);
+            }
 
-    if (setting.readBytes < 0) {
-		printf("Read error\n");
-	}
+            break;
+        default:
+            break;
+    }
+
+    CH(client.read_bytes);
+
+    if (client.read_bytes == 0) {
+        printf("Connection close\n");
+        disconnect();
+    }
+
+    client.message_to_receive[BUFFER_SIZE] = '\0';
+
+    if (mode == READ) {
+        printf("Get from server > %s\n", client.message_to_receive);
+    }
 }
 
-int main(int argc, char *argv[]) {
-    getConfig(argc, argv);  
-    clientFunction();
-	return 0;
+void poll_iterate() {
+    if (client.fds[0].revents & POLLIN) {
+        socket_fun(READ);
+    }
+
+    if (client.fds[0].revents & POLLOUT) {
+        socket_fun(WRITE);
+    }
+}
+
+void init_poll() {
+    printf("Poll inited\n");
+}
+
+void client_fun() {
+    init_poll();
+
+    int ret;
+
+    while ((ret = poll(client.fds, 1, TIMEOUT * 1000)) != -1) {
+        if(ret == 0) {
+            printf("TIMEOUT\n");
+        }
+
+        poll_iterate();
+    }
+
+    printf("Poll exception.\n");
+}
+
+void client_init() {
+    struct sockaddr_in client_addr;
+    memset(&client_addr, 0, sizeof(client_addr));
+    client_addr.sin_family = AF_INET;
+
+    if (inet_pton(AF_INET, client.ip_name, &client_addr.sin_addr) <= 0) {
+        printf("\n inet_pton() error\n");
+        exit(EXIT_FAILURE);
+    }
+
+    close(client.fds[0].fd);
+    client.fds[0].fd = socket(AF_INET, SOCK_STREAM, 0);
+    client_addr.sin_port = htons(client.port_server);
+
+    if(connect(client.fds[0].fd, (struct sockaddr*) &client_addr, sizeof(client_addr)) != 0) {
+        printf("Connection is failed: server is down.\n");
+        printf("Start server or reboot if it works.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    CH(client.fds[0].fd);
+    client.fds[0].events = POLLIN | POLLOUT;
+    printf("Client successfully connected to the server.\n");
+}
+
+int main(int argc, char* argv[]) {
+    get_argv(argc, argv);
+
+    printf("Please, enter some message:");
+    scanf("%80[^\n]s", client.message_to_send);
+    client_init();
+    client_fun();
 }
