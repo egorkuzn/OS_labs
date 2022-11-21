@@ -15,7 +15,7 @@ typedef struct {
     int port_server;             /* server port            */
     char* ip_name;               /* server ip address      */
     ssize_t read_bytes;          /* read bytes real amount */
-    struct pollfd fds[2];        /* fd array for poll      */
+    struct pollfd fds[1];        /* fd array for poll      */
     char message_to_send[BUFFER_SIZE + 1];
     char message_to_receive[BUFFER_SIZE + 1];
 } client_t;
@@ -55,8 +55,7 @@ void socket_fun(client_mode_t mode) {
             client.read_bytes = read(client.fds[0].fd, client.message_to_receive, BUFFER_SIZE);
             break;
         case WRITE:
-            scanf("%s", client.message_to_send);
-            client.read_bytes = write(client.fds[0].fd, client.message_to_send, sizeof (client.message_to_send));
+            client.read_bytes = write(client.fds[0].fd, client.message_to_send, BUFFER_SIZE);
             break;
         default:
             break;
@@ -72,43 +71,33 @@ void socket_fun(client_mode_t mode) {
     printf("Get from server > %s\n", client.message_to_receive);
 }
 
-void console_reader_fun() {
-    client.read_bytes = read(client.fds[1].fd, client.message_to_send, BUFFER_SIZE);
-    CH(client.read_bytes);
-    client.message_to_send[BUFFER_SIZE] = '\0';
-}
-
 void poll_iterate() {
     if (client.fds[0].revents & POLLIN) {
         socket_fun(READ);
-        printf("Read from socket fished.\n");
     }
 
     if (client.fds[0].revents & POLLOUT) {
         socket_fun(WRITE);
-        printf("Write in socket fished.\n");
     }
 }
 
 void init_poll() {
-    for (int i = 0; i < 2; i++) {
-        client.fds[i].fd = -1;
-    }
-
     printf("Poll inited\n");
 }
 
 void client_fun() {
     init_poll();
 
-    client.fds[1].fd = STDIN_FILENO;
-    client.fds[1].events = POLLIN;
     int ret;
 
-    while ((ret = poll(client.fds, 2, TIMEOUT * 1000)) != -1) {
+    while ((ret = poll(client.fds, 1, TIMEOUT * 1000)) != -1) {
+        CH(client.fds[0].fd);
+
         if(ret == 0) {
             printf("TIMEOUT\n");
         }
+
+        CH(client.fds[0].fd);
 
         poll_iterate();
     }
@@ -143,6 +132,9 @@ void client_init() {
 
 int main(int argc, char* argv[]) {
     get_argv(argc, argv);
+
+    printf("Please, enter some message:");
+    scanf("%80[^\n]s", client.message_to_send);
     client_init();
     client_fun();
 }

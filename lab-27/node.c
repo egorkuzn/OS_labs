@@ -86,6 +86,7 @@ void disconnect(int i) {
     close(node.fds[i].fd);
     node.fds[i].fd = -1;
     node.clients_translator[i] = -1;
+    printf("Client %d$ DISCONNECTED\n", i);
 }
 
 void client_fun_io(int i, client_mode_t mode) {
@@ -95,7 +96,7 @@ void client_fun_io(int i, client_mode_t mode) {
             node.read_bytes = read(node.fds[i].fd, node.client_message, BUFFER_SIZE);
             break;
         case WRITE:
-            node.read_bytes = write(node.fds[i].fd, node.broadcast_message, sizeof (node.broadcast_message));
+            node.read_bytes = write(node.fds[i].fd, node.broadcast_message, BUFFER_SIZE);
             break;
         default:
             break;
@@ -104,7 +105,6 @@ void client_fun_io(int i, client_mode_t mode) {
 
 void client_fun(int i, client_mode_t mode) {
     if (i >= MAX_CLIENTS * 2) {
-        printf("Reader out of bounds\n");
         return;
     }
 
@@ -115,14 +115,14 @@ void client_fun(int i, client_mode_t mode) {
         disconnect(i);
     } else if (mode == READ) {
         node.client_message[node.read_bytes] = '\0';
-        printf("client$%d$%zd > %s\n", i, node.read_bytes, node.client_message);
+        printf("Client %d$ > %s\n", i, node.client_message);
     }
 }
 
-void broadcast_fun() {
-    node.read_bytes = read(STDIN_FILENO, node.broadcast_message, BUFFER_SIZE);
+void broadcast_msg_get() {
+    printf("Please, enter broadcast message for node: ");
+    node.read_bytes = scanf("%80[^\n]s", node.broadcast_message);
     CH(node.read_bytes);
-    node.broadcast_message[node.read_bytes] = '\0';
 }
 
 void poll_iterate() {
@@ -156,6 +156,7 @@ void init_poll() {
 
 void node_fun() {
     init_poll();
+    broadcast_msg_get();
 
     node.fds[MAX_FD_COUNT - 1].fd = node.listener;
     node.fds[MAX_FD_COUNT - 1].events = POLLIN;

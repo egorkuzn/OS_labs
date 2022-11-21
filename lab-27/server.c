@@ -66,12 +66,25 @@ int find_new_client_index() {
     return -1;
 }
 
+void disconnect(int i) {
+    int _ = i % MAX_CLIENTS;
+    close(server.fds[_].fd);
+    close(server.fds[_ + MAX_CLIENTS].fd);
+    server.fds[_].fd = -1;
+    server.fds[_ + MAX_CLIENTS].fd = -1;
+    server.clients[_] = -1;
+    server.clients_translator[_] = -1;
+}
+
 int accept_new_client(int new_client_index) {
     server.clients[new_client_index] = accept(server.listener, (struct sockaddr*) NULL, NULL);
 
     if (server.clients[new_client_index] != -1) {
         server.fds[new_client_index].fd = server.clients[new_client_index];
         server.fds[new_client_index].events = POLLIN | POLLOUT;
+        printf("Successful accept for new_client_index %d\n", new_client_index);
+    } else {
+        printf("Bad accept for new_client_index %d\n", new_client_index);
     }
 
     return server.clients[new_client_index];
@@ -87,11 +100,13 @@ int create_new_node_connect(int new_client_index) {
         exit(EXIT_FAILURE);
     }
 
-    do {
-        close(server.clients_translator[new_client_index]);
-        server.clients_translator[new_client_index] = socket(AF_INET, SOCK_STREAM, 0);
-        client_addr.sin_port = htons(server.port_node);
-    } while (connect(server.clients_translator[new_client_index], (struct sockaddr*) &client_addr, sizeof(client_addr)) != 0);
+    server.clients_translator[new_client_index] = socket(AF_INET, SOCK_STREAM, 0);
+    client_addr.sin_port = htons(server.port_node);
+
+    if (connect(server.clients_translator[new_client_index], (struct sockaddr*) &client_addr, sizeof(client_addr)) != 0) {
+        printf("Client::%d connection failed\n", new_client_index);
+        return -1;
+    }
 
     printf("Translate %d to %d\n", new_client_index, server.clients_translator[new_client_index]);
 
@@ -111,22 +126,14 @@ void listener_fun() {
     }
     /* Successful connection try */
     if (accept_new_client(new_client_index) == -1) {
+        disconnect(new_client_index);
         return;
     }
 
     if (create_new_node_connect(new_client_index) == -1) {
+        disconnect(new_client_index);
         return;
     }
-}
-
-void disconnect(int i) {
-    int _ = i % MAX_CLIENTS;
-    close(server.fds[_].fd);
-    close(server.fds[_ + MAX_CLIENTS].fd);
-    server.fds[_].fd = -1;
-    server.fds[_ + MAX_CLIENTS].fd = -1;
-    server.clients[_] = -1;
-    server.clients_translator[_] = -1;
 }
 
 char* message_to_send(int i) {
@@ -144,7 +151,7 @@ void client_fun_switch(int i, client_mode_t mode) {
             server.read_bytes = read(server.fds[i].fd, server.messages[i], BUFFER_SIZE);
             break;
         case WRITE:
-            server.read_bytes = write(server.fds[i].fd, message_to_send(i), sizeof (message_to_send(i)));
+            server.read_bytes = write(server.fds[i].fd, /*"clieeeent here\n\0"*/message_to_send(i), BUFFER_SIZE);
             break;
         default:
             break;
@@ -153,7 +160,6 @@ void client_fun_switch(int i, client_mode_t mode) {
 
 void client_fun(int i, client_mode_t mode) {
     if (i >= MAX_CLIENTS * 2) {
-        printf("Reader out of bounds\n");
         return;
     }
 
@@ -173,6 +179,7 @@ void poll_iterate() {
         }
 
         if (server.fds[i].revents & POLLIN) {
+
             if (i == MAX_FD_COUNT - 1) {
                 listener_fun();
             } else {
@@ -197,6 +204,7 @@ void server_fun() {
 
     server.fds[MAX_FD_COUNT - 1].fd = server.listener;
     server.fds[MAX_FD_COUNT - 1].events = POLLIN;
+    printf("Poll loop start.\n");
 
     while (poll(server.fds, MAX_FD_COUNT, TIMEOUT * 1000) != -1) {
         poll_iterate();        
@@ -225,6 +233,7 @@ void server_init() {
     CH(bind(server.listener, (struct sockaddr*) &ip_of_server, sizeof(ip_of_server)));
     CH(listen(server.listener, MAX_QUEUE));
     server_clients_init();
+    printf("Server inited.\n");
 }
 
 void TEST() {
