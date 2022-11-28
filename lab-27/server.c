@@ -7,11 +7,11 @@
 #include <string.h>
 #include <assert.h>
 
-#define MAX_FD_COUNT 1024 /* open files limit  */
-#define MAX_CLIENTS  510  /* connections limit */
-#define MAX_QUEUE    5    /* max queue process */
+#define MAX_FD_COUNT 1024 /* open files limit         */
+#define MAX_CLIENTS  510  /* connections limit        */
+#define MAX_QUEUE    5    /* max queue process        */
 #define BUFFER_SIZE  80   /* max client_message size  */
-#define TIMEOUT      10   /* in seconds        */
+#define TIMEOUT      10   /* in seconds               */
 #define CH(a) check_fun(a, __FILE__, __FUNCTION__, __LINE__)
 
 /* Structure for server params: */
@@ -20,11 +20,11 @@ typedef struct {
     int port_clients; /* where to listen          */
     char* ip_name;    /* address to translate     */
     int listener;     /* fd for clients listening */
-    ssize_t read_bytes;                              /* read bytes real amount      */
-    int clients[MAX_CLIENTS];                        /* clients sockets             */
+    ssize_t read_bytes;                              /* read bytes real amount        */
+    int clients[MAX_CLIENTS];                        /* clients sockets               */
     int clients_translator[MAX_CLIENTS];             /* clients translators on server */
-    struct pollfd fds[MAX_FD_COUNT];                 /* fd array for poll           */
-    char messages[MAX_CLIENTS * 2][BUFFER_SIZE + 1]; /* all client_message cashed         */
+    struct pollfd fds[MAX_FD_COUNT];                 /* fd array for poll             */
+    char messages[MAX_CLIENTS * 2][BUFFER_SIZE + 1]; /* all client_message cashed     */
 } server_t;
 
 typedef enum{
@@ -147,13 +147,13 @@ char* message_to_send(int i) {
 void client_fun_switch(int i, client_mode_t mode) {
     switch (mode) {
         case READ:
-            memset(server.messages[i], NULL, BUFFER_SIZE);
+            memset(server.messages[i], 0, BUFFER_SIZE);
             server.read_bytes = read(server.fds[i].fd, server.messages[i], BUFFER_SIZE);
             break;
         case WRITE:
             if (message_to_send(i)[0] != '\0') {
                 server.read_bytes = write(server.fds[i].fd, message_to_send(i), BUFFER_SIZE);
-                memset(message_to_send(i), NULL, BUFFER_SIZE);
+                memset(message_to_send(i), 0, BUFFER_SIZE);
             }
 
             break;
@@ -169,10 +169,12 @@ void client_fun(int i, client_mode_t mode) {
 
     client_fun_switch(i, mode);
 
-    if (server.read_bytes <= 0) {
-        disconnect(i);
-    } else {
-        server.messages[i][server.read_bytes] = '\0';
+    if(mode == READ) {
+        if (server.read_bytes <= 0) {
+            disconnect(i);
+        } else {
+            server.messages[i][server.read_bytes] = '\0';
+        }
     }
 }
 
@@ -218,7 +220,7 @@ void server_fun() {
 }
 
 void sockaddr_init(struct sockaddr_in* ip_of_server) {
-    memset(ip_of_server, NULL, sizeof(*ip_of_server));
+    memset(ip_of_server, 0, sizeof(*ip_of_server));
     
     ip_of_server -> sin_family = AF_INET;
     ip_of_server -> sin_addr.s_addr = htonl(INADDR_ANY);
@@ -233,7 +235,7 @@ void server_clients_init() {
 void server_init() {
     struct sockaddr_in ip_of_server;
     sockaddr_init(&ip_of_server);
-    server.listener = socket(AF_INET, SOCK_STREAM, NULL);
+    server.listener = socket(AF_INET, SOCK_STREAM, 0);
     CH(bind(server.listener, (struct sockaddr*) &ip_of_server, sizeof(ip_of_server)));
     CH(listen(server.listener, MAX_QUEUE));
     server_clients_init();

@@ -20,10 +20,10 @@ typedef struct {
     int listener;                            /* fd for clients listening      */
     ssize_t read_bytes;                      /* read bytes real amount        */
     int clients_translator[MAX_CLIENTS];     /* clients translators on server */
-    time_t last_update_time;                 /* time of last update           */
     struct pollfd fds[MAX_FD_COUNT];         /* fd array for poll             */
     char client_message[BUFFER_SIZE + 1];    /* client message buffer         */
     char broadcast_message[BUFFER_SIZE + 1]; /* broadcast notification        */
+    time_t last_update_time[MAX_CLIENTS];    /* time of last update           */
 } node_t;
 
 typedef enum{
@@ -91,21 +91,21 @@ void disconnect(int i) {
     printf("Client %d$ DISCONNECTED\n", i);
 }
 
-int time_from_last_update() {
-    return (int) (difftime(time(NULL), node.last_update_time) / CLOCKS_PER_SEC);
+int time_from_last_update(int i) {
+    return (int) difftime(time(NULL), node.last_update_time[i]);
 }
 
 void client_fun_io(int i, client_mode_t mode) {
     switch (mode) {
         case READ:
-            memset(node.client_message, NULL, BUFFER_SIZE);
+            memset(node.client_message, 0, BUFFER_SIZE);
             node.read_bytes = read(node.fds[i].fd, node.client_message, BUFFER_SIZE);
             break;
         case WRITE:
-//            if (time_from_last_update() >= 1) {
+            if (time_from_last_update(i) >= 1) {
                 node.read_bytes = write(node.fds[i].fd, node.broadcast_message, BUFFER_SIZE);
-                node.last_update_time = time(NULL);
-//            }
+                node.last_update_time[i] = time(NULL);
+            }
 
             break;
         default:
@@ -114,19 +114,21 @@ void client_fun_io(int i, client_mode_t mode) {
 }
 
 void client_fun(int i, client_mode_t mode) {
-    if (i >= MAX_CLIENTS * 2) {
+    if (i >= MAX_CLIENTS) {
         return;
     }
 
     node.read_bytes = 0;
     client_fun_io(i, mode);
 
-    if (node.read_bytes <= 0) {
-        disconnect(i);
-    } else if (mode == READ) {
-        node.client_message[node.read_bytes] = '\0';
-        printf("Client %d$ > %s\n", i, node.client_message);
-        memset(node.client_message, NULL, BUFFER_SIZE);
+    if (mode == READ) {
+        if (node.read_bytes <= 0) {
+            disconnect(i);
+        } else {
+            node.client_message[node.read_bytes] = '\0';
+            printf("Client %d$ > %s\n", i, node.client_message);
+            memset(node.client_message, 0, BUFFER_SIZE);
+        }
     }
 }
 
@@ -180,7 +182,7 @@ void node_fun() {
 }
 
 void sockaddr_init(struct sockaddr_in* ip_of_node) {
-    memset(ip_of_node, NULL, sizeof(*ip_of_node));
+    memset(ip_of_node, 0, sizeof(*ip_of_node));
 
     ip_of_node -> sin_family = AF_INET;
     ip_of_node -> sin_addr.s_addr = htonl(INADDR_ANY);
@@ -188,13 +190,14 @@ void sockaddr_init(struct sockaddr_in* ip_of_node) {
 }
 
 void node_clients_init() {
+    memset(&node.last_update_time, 0, MAX_CLIENTS * sizeof(int));
     memset(&node.clients_translator, -1, MAX_CLIENTS * sizeof(int));
 }
 
 void node_init() {
     struct sockaddr_in ip_of_node;
     sockaddr_init(&ip_of_node);
-    node.listener = socket(AF_INET, SOCK_STREAM, NULL);
+    node.listener = socket(AF_INET, SOCK_STREAM, 0);
     CH(bind(node.listener, (struct sockaddr*) &ip_of_node, sizeof(ip_of_node)));
     CH(listen(node.listener, MAX_QUEUE));
     node_clients_init();
