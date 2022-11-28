@@ -50,7 +50,7 @@ void get_argv(int argc, char* argv[]) {
 }
 
 int time_from_last_update() {
-    return (int) (difftime(time(NULL), client.last_update_time) / CLOCKS_PER_SEC);
+    return (int) difftime(time(NULL), client.last_update_time);
 }
 
 void disconnect() {
@@ -78,14 +78,14 @@ void socket_fun(client_mode_t mode) {
 
     CH(client.read_bytes);
 
-    if (client.read_bytes == 0) {
-        printf("Connection close\n");
-        disconnect();
-    }
-
-    client.message_to_receive[BUFFER_SIZE] = '\0';
-
     if (mode == READ) {
+        if (client.read_bytes == 0) {
+            printf("Connection close\n");
+            disconnect();
+        }
+
+        client.message_to_receive[BUFFER_SIZE] = '\0';
+
         printf("Get from server > %s\n", client.message_to_receive);
     }
 }
