@@ -1,187 +1,210 @@
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <errno.h>
+#include <poll.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
 #include <string.h>
-#include <sys/types.h>
 #include <time.h>
-#include <stdbool.h>
 
-#define CLIENTS_AMOUNT 510
-#define BUFFER_SIZE 80
+#define MAX_FD_COUNT 1024 /* open files limit  */
+#define MAX_CLIENTS  510  /* connections limit */
+#define MAX_QUEUE    5    /* max queue process */
+#define BUFFER_SIZE  80   /* max message size  */
+#define TIMEOUT      1    /* in seconds        */
+#define CH(a) check_fun(a, __FILE__, __FUNCTION__, __LINE__)
 
-typedef struct {    
-    int port;
-    int listenFd;
-    int readBytes;
-    struct sockaddr_in servAddr;
-    int clients[CLIENTS_AMOUNT];
-    char sendBuff[1025];
-} config_t;
-
+/* Structure for server params: */
 typedef struct {
-    fd_set lfds;
-    fd_set cfds;
-    fd_set readfds;
-    struct timeval timeout;
-    char c[BUFFER_SIZE + 1];
-} select_config_t;
+    int port_server;                         /* server port                   */
+    int listener;                            /* fd for clients listening      */
+    ssize_t read_bytes;                      /* read bytes real amount        */
+    int clients_translator[MAX_CLIENTS];     /* clients translators on server */
+    struct pollfd fds[MAX_FD_COUNT];         /* fd array for poll             */
+    char client_message[BUFFER_SIZE + 1];    /* client message buffer         */
+    char broadcast_message[BUFFER_SIZE + 1]; /* broadcast notification        */
+    time_t last_update_time[MAX_CLIENTS];    /* time of last update           */
+} node_t;
 
-config_t node = {
-    .clients = {-1},
-    .sendBuff = {0}
-};
-select_config_t setting = {
-    .timeout = {
-        .tv_sec = 0,
-        .tv_usec = 0
+typedef enum{
+    READ,
+    WRITE
+} client_mode_t;
+
+node_t node;
+
+void check_fun(int ret, const char program_name[], const char fun_name[], int line) {
+    if (ret == -1) {
+        fprintf(stderr, "%s:%s:%d exception\n", program_name, fun_name, line);
+        exit(EXIT_FAILURE);
     }
-};
+}
+/* Getting info from console input: */
+void get_argv(int argc, char* argv[]) {
+    if (argc == 2) {
+        node.port_server = atoi(argv[1]);
+    } else {
+        printf("Expected:\n");
+        printf("* Server port.\n");
+        printf("Don't worry, just try again.\n");
+        exit(EXIT_FAILURE);
+    }
+}
 
-int findFreeUserIndex(int clients[]) {
-    for(int i = 0; i < CLIENTS_AMOUNT; i++){
-        if(clients[i] == -1) {
+int find_new_client_index() {
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        if (node.clients_translator[i] == -1) {
             return i;
         }
     }
+
     return -1;
 }
 
-void userDisconnect(int clients[], int clientIndex){
-    printf("client %d disconnected\n", clientIndex);
-    close(clients[clientIndex]);
-    clients[clientIndex] = -1;
-}
+int accept_new_client(int new_client_index) {
+    node.clients_translator[new_client_index] = accept(node.listener, (struct sockaddr*) NULL, NULL);
 
-void servAddrInit() {
-    memset(&node.servAddr, 0, sizeof(node.servAddr));
-    node.servAddr.sin_family = AF_INET;
-    node.servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    node.servAddr.sin_port = htons(node.port);
-}
-
-void initConfigStruct() {
-    memset(node.clients, -1, sizeof(int) * CLIENTS_AMOUNT);    
-    node.listenFd  = socket(AF_INET, SOCK_STREAM, 0);
-    shutdown(node.listenFd, SHUT_RDWR);
-    
-    if (node.port >= 65535){
-        printf("Port must be less than 65535");
-        exit(EXIT_FAILURE);
-    }
-    
-    servAddrInit();
-
-    if (bind(node.listenFd, (struct sockaddr*)&node.servAddr, sizeof(node.servAddr)) == -1) {
-        perror("bind");
-        exit(EXIT_FAILURE);
+    if (node.clients_translator[new_client_index] != -1) {
+        node.fds[new_client_index].fd = node.clients_translator[new_client_index];
+        node.fds[new_client_index].events = POLLIN | POLLOUT;
     }
 
-    listen(node.listenFd, 5);
+    return node.clients_translator[new_client_index];
 }
 
-void getConfig(int argc, char* argv[]) {
-    if (argc == 2) {
-        node.port = atoi(argv[1]);
-    } else {
-        printf("Invalid number of arguments\n"); 
-        printf("Expected:\n");
-        printf("* Port number.\n");
-        printf("Try again, please.\n");
-        exit(EXIT_FAILURE);
+void listener_fun() {
+    int new_client_index = find_new_client_index();
+
+    if (new_client_index == -1) {
+        return; /* Failed connection try */
+    }
+    /* Successful connection try */
+    if (accept_new_client(new_client_index) == -1) {
+        return;
     }
 }
 
-bool listenFunction(int listener) {
-    if(listener){            
-        int newClientIndex = findFreeUserIndex(node.clients);
-            
-        if(newClientIndex == -1){
-            return false;
-        }
-            
-        node.clients[newClientIndex] = accept(node.listenFd, (struct sockaddr*)NULL, NULL);            
-        printf("client %d accepted\n", node.clients[newClientIndex]);
-    }
-
-    return true;
+void disconnect(int i) {
+    close(node.fds[i].fd);
+    node.fds[i].fd = -1;
+    node.clients_translator[i] = -1;
+    printf("Client %d$ DISCONNECTED\n", i);
 }
 
-bool clientsRespondFunction() {
-    for (int i = 0; i < CLIENTS_AMOUNT; i++) {
-                
-        if(node.clients[i] == -1){
-            return false;
-        }
-            
-        FD_ZERO(&setting.cfds);
-        FD_SET(node.clients[i], &setting.cfds);
-            
-        if(select(node.clients[i] + 1, &setting.cfds, NULL, NULL, &setting.timeout)) {
-            if((node.readBytes = read(node.clients[i], &setting.c, BUFFER_SIZE)) <=0) {
-                userDisconnect(node.clients, i); // so many questions
-                return false;
+int time_from_last_update(int i) {
+    return (int) difftime(time(NULL), node.last_update_time[i]);
+}
+
+void client_fun_io(int i, client_mode_t mode) {
+    switch (mode) {
+        case READ:
+            memset(node.client_message, 0, BUFFER_SIZE);
+            node.read_bytes = read(node.fds[i].fd, node.client_message, BUFFER_SIZE);
+            break;
+        case WRITE:
+            if (time_from_last_update(i) >= 1) {
+                node.read_bytes = write(node.fds[i].fd, node.broadcast_message, BUFFER_SIZE);
+                node.last_update_time[i] = time(NULL);
             }
 
-            setting.c[node.readBytes] = '\0';
-            printf("client %d: %s\n", i, setting.c);
-        }
-                
+            break;
+        default:
+            break;
     }
-
-    return true;
 }
 
-bool clientsBroadcastFunction(int broadcast) {
-    if(broadcast) {
-        if(node.readBytes = read(STDIN_FILENO, &setting.c, BUFFER_SIZE)) {
-            setting.c[node.readBytes] = '\0';
-                
-            for(int i = 0; i < CLIENTS_AMOUNT; i++) {
-                if(node.clients[i] == -1){
-                    return false;
-                }
+void client_fun(int i, client_mode_t mode) {
+    if (i >= MAX_CLIENTS) {
+        return;
+    }
 
-                write(node.clients[i], setting.c, node.readBytes);
+    node.read_bytes = 0;
+    client_fun_io(i, mode);
+
+    if (mode == READ) {
+        if (node.read_bytes <= 0) {
+            disconnect(i);
+        } else {
+            node.client_message[node.read_bytes] = '\0';
+            printf("Client %d$ > %s\n", i, node.client_message);
+            memset(node.client_message, 0, BUFFER_SIZE);
+        }
+    }
+}
+
+void broadcast_msg_get() {
+    printf("Please, enter broadcast message for node: ");
+    node.read_bytes = scanf("%80[^\n]s", node.broadcast_message);
+    CH(node.read_bytes);
+}
+
+void poll_iterate() {
+    for (int i = 0; i < MAX_FD_COUNT; i++) {
+        if (node.fds[i].fd == -1) {
+            continue;
+        }
+
+        if (node.fds[i].revents & POLLIN) {
+            switch (i) {
+                case MAX_FD_COUNT - 1:
+                    listener_fun();
+                    break;
+                default:
+                    client_fun(i, READ);
+                    break;
             }
         }
-    }
 
-    return true;
-}
-
-void closeAll() {
-    
-}
-
-void nodeFunction() {
-    while(true) {
-        FD_ZERO(&setting.lfds);
-        FD_SET(node.listenFd, &setting.lfds);
-
-        if (!listenFunction(select(node.listenFd + 1, &setting.lfds, NULL, NULL, &setting.timeout))) {
-            continue;
-        }
-            
-        if (!clientsRespondFunction()) {
-            continue;
-        }
-            
-        FD_ZERO(&setting.readfds);
-        FD_SET(STDIN_FILENO, &setting.readfds);
-        
-        if (!clientsBroadcastFunction(select(STDIN_FILENO + 1, &setting.readfds, NULL, NULL, &setting.timeout))) {
-            continue;
+        if (node.fds[i].revents & POLLOUT) {
+            client_fun(i, WRITE);
         }
     }
 }
 
-int main(int argc, char *argv[]) {
-    getConfig(argc, argv);
-    initConfigStruct();     
-    nodeFunction();
+void init_poll() {
+    for (int i = 0; i < MAX_FD_COUNT; i++) {
+        node.fds[i].fd = -1;
+    }
 }
 
+void node_fun() {
+    init_poll();
+    broadcast_msg_get();
+
+    node.fds[MAX_FD_COUNT - 1].fd = node.listener;
+    node.fds[MAX_FD_COUNT - 1].events = POLLIN;
+
+    while (poll(node.fds, MAX_FD_COUNT, TIMEOUT * 10000) != -1) {
+        poll_iterate();
+    }
+
+    printf("Poll exception.\n");
+}
+
+void sockaddr_init(struct sockaddr_in* ip_of_node) {
+    memset(ip_of_node, 0, sizeof(*ip_of_node));
+
+    ip_of_node -> sin_family = AF_INET;
+    ip_of_node -> sin_addr.s_addr = htonl(INADDR_ANY);
+    ip_of_node -> sin_port = htons(node.port_server);
+}
+
+void node_clients_init() {
+    memset(&node.last_update_time, 0, MAX_CLIENTS * sizeof(int));
+    memset(&node.clients_translator, -1, MAX_CLIENTS * sizeof(int));
+}
+
+void node_init() {
+    struct sockaddr_in ip_of_node;
+    sockaddr_init(&ip_of_node);
+    node.listener = socket(AF_INET, SOCK_STREAM, 0);
+    CH(bind(node.listener, (struct sockaddr*) &ip_of_node, sizeof(ip_of_node)));
+    CH(listen(node.listener, MAX_QUEUE));
+    node_clients_init();
+}
+
+int main(int argc, char* argv[]) {
+    get_argv(argc, argv);
+    node_init();
+    node_fun();
+}
