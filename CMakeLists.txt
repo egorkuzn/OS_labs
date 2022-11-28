@@ -4,4 +4,4 @@ project(OS_labs)
 set(CMAKE_CXX_STANDARD 11)
 
 add_executable(OS_labs
-        lab-27/client.c)
+        lab-27/client.c lab-31/Main.cpp lab-31/Main.h lab-31/Proxy.cpp lab-31/Proxy.h lab-31/Main.cpp)
