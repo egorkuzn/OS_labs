@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
     std::cout << "Starting proxy on port " << argv[1]  << " ..."<< std::endl;
 
     int port = atoi(argv[1]);
-    auto* proxy = new Proxy(port);
+    auto* proxy = new lab31::Proxy(port);
 
     proxy->run();
 
