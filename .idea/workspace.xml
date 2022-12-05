@@ -18,10 +18,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="53d26488-ea9e-4940-b736-aea5cfaaede6" name="Changes" comment="Connection and Client handlers headers done">
-      <change beforePath="$PROJECT_DIR$/lab-31/Handlers/ClientHandler.h" beforeDir="false" afterPath="$PROJECT_DIR$/lab-31/Handlers/ClientHandler.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lab-31/Handlers/ConnectionHandler.h" beforeDir="false" afterPath="$PROJECT_DIR$/lab-31/Handlers/ConnectionHandler.h" afterDir="false" />
-    </list>
+    <list default="true" id="53d26488-ea9e-4940-b736-aea5cfaaede6" name="Changes" comment="ClientHandler.cpp done" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -137,14 +134,7 @@
       <workItem from="1670126560972" duration="14489000" />
       <workItem from="1670145634320" duration="1755000" />
       <workItem from="1670150034867" duration="22016000" />
-      <workItem from="1670217497494" duration="5421000" />
-    </task>
-    <task id="LOCAL-00001" summary="continue server.c writing">
-      <created>1668530431037</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1668530431037</updated>
+      <workItem from="1670217497494" duration="6169000" />
     </task>
     <task id="LOCAL-00002" summary="finishing server.c">
       <created>1668537365796</created>
@@ -475,7 +465,21 @@
       <option name="project" value="LOCAL" />
       <updated>1670223020745</updated>
     </task>
-    <option name="localTasksCounter" value="49" />
+    <task id="LOCAL-00049" summary="ServerHandler header done">
+      <created>1670223097461</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1670223097461</updated>
+    </task>
+    <task id="LOCAL-00050" summary="ClientHandler.cpp done">
+      <created>1670223158045</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1670223158045</updated>
+    </task>
+    <option name="localTasksCounter" value="51" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -493,8 +497,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="headers finished" />
-    <MESSAGE value="Cache.cpp code writing start" />
     <MESSAGE value="Cache.cpp finished" />
     <MESSAGE value="Cache record .h and .cpp files finished" />
     <MESSAGE value="Server handler done, client started" />
@@ -518,6 +520,8 @@
     <MESSAGE value="CacheRecord class finished" />
     <MESSAGE value="Cache classes finished" />
     <MESSAGE value="Connection and Client handlers headers done" />
-    <option name="LAST_COMMIT_MESSAGE" value="Connection and Client handlers headers done" />
+    <MESSAGE value="ServerHandler header done" />
+    <MESSAGE value="ClientHandler.cpp done" />
+    <option name="LAST_COMMIT_MESSAGE" value="ClientHandler.cpp done" />
   </component>
 </project>
