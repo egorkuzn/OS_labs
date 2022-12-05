@@ -18,7 +18,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="53d26488-ea9e-4940-b736-aea5cfaaede6" name="Changes" comment="force commit" />
+    <list default="true" id="53d26488-ea9e-4940-b736-aea5cfaaede6" name="Changes" comment="proxy class added" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -134,7 +134,7 @@
       <workItem from="1670126560972" duration="14489000" />
       <workItem from="1670145634320" duration="1755000" />
       <workItem from="1670150034867" duration="22016000" />
-      <workItem from="1670217497494" duration="4037000" />
+      <workItem from="1670217497494" duration="4434000" />
     </task>
     <task id="LOCAL-00001" summary="continue server.c writing">
       <created>1668530431037</created>
@@ -402,7 +402,35 @@
       <option name="project" value="LOCAL" />
       <updated>1670221435407</updated>
     </task>
-    <option name="localTasksCounter" value="39" />
+    <task id="LOCAL-00039" summary="from the clear list ...">
+      <created>1670221741782</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1670221741782</updated>
+    </task>
+    <task id="LOCAL-00040" summary="main.cpp added">
+      <created>1670221893892</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1670221893892</updated>
+    </task>
+    <task id="LOCAL-00041" summary="new dirs added">
+      <created>1670221962030</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1670221962030</updated>
+    </task>
+    <task id="LOCAL-00042" summary="proxy class added">
+      <created>1670222015063</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1670222015063</updated>
+    </task>
+    <option name="localTasksCounter" value="43" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -420,10 +448,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="final commit for this day| it no workes" />
-    <MESSAGE value="removed input from while" />
-    <MESSAGE value="bug fixed!!! all work!!!" />
-    <MESSAGE value="monday commit" />
     <MESSAGE value="Works correct, final lab-27 commit" />
     <MESSAGE value="README.md added" />
     <MESSAGE value="Lab 31 started" />
@@ -445,6 +469,10 @@
     <MESSAGE value="namespace update" />
     <MESSAGE value="cmake replacement" />
     <MESSAGE value="force commit" />
-    <option name="LAST_COMMIT_MESSAGE" value="force commit" />
+    <MESSAGE value="from the clear list ..." />
+    <MESSAGE value="main.cpp added" />
+    <MESSAGE value="new dirs added" />
+    <MESSAGE value="proxy class added" />
+    <option name="LAST_COMMIT_MESSAGE" value="proxy class added" />
   </component>
 </project>
