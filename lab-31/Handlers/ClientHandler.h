@@ -7,9 +7,18 @@
 
 
 #include <string>
+#include <poll.h>
+#include <netdb.h>
+#include <cstring>
+#include <csignal>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+
+#include "../Proxy.h"
+#include "ServerHandler.h"
 #include "ConnectionHandler.h"
 #include "../Cache/CacheRecord.h"
-#include "ServerHandler.h"
 
 namespace lab31 {
 
@@ -38,7 +47,7 @@ namespace lab31 {
         static std::string getPrVersion(std::string in);
         void deleteCache() override;
         size_t getReadElements() override;
-        CacheRecord* getCacheRecord() override { return  record;}
+        CacheRecord* getCacheRecord() override { return record;}
     private:
         int timeAlive = 100;
         int clientSocket;

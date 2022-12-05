@@ -6,17 +6,17 @@
 
 namespace lab31 {
     ClientHandler::ClientHandler(int sock, Proxy *clientProxy){
-        this->clientSocket = sock;
-        this->proxy = clientProxy;
-        this->server = nullptr;
-        this->url = "";
-        this->host = "";
-        this->record = nullptr;
+        this -> clientSocket = sock;
+        this -> proxy = clientProxy;
+        this -> server = nullptr;
+        this -> url = "";
+        this -> host = "";
+        this -> record = nullptr;
     }
 
     void ClientHandler::deleteCache(){
         std::cout << "deleteCache";
-        record->deleteRecord(url);
+        record -> deleteRecord(url);
     }
 
 //POLLIN - есть данные для чтения.
@@ -42,23 +42,15 @@ namespace lab31 {
             return true;
         }
 
-
-
         if (event & POLLOUT) {
-            if (!initialized || record->isBroken()) {
+            if (!initialized || record -> isBroken()) {
                 return false;
             }
 
-            /*if (!firstWriter && readPointer >= record->getDataSize() && !cachingInParallel) {
-                //std::cerr << "Caught up with the first writer. Now caching in parallel";
-                //std::cout << "??" << '\n';
-                cachingInParallel = true;
-                return true;
-            }*/
-            if (readPointer <= record->getDataSize()) {
+            if (readPointer <= record -> getDataSize()) {
                 //std::cout << "proxy send data" << "\n";
                 //std::cout << "start read " << '\n';
-                std::string buffer = record->read(readPointer, BUF_SIZE);
+                std::string buffer = record -> read(readPointer, BUFSIZ);
                 ssize_t ret = send(clientSocket, buffer.data(), buffer.size(), 0);
                 //std::cout << "end read " << '\n';
                 if (ret == -1) {
@@ -69,8 +61,7 @@ namespace lab31 {
 
                 if (buffer.empty()){
                     //std::cout << "asdasdas" << '\n';
-                    //proxy->getCache()->unsubscribe(url, clientSocket);
-                    proxy->deleteEvent(clientSocket, POLLOUT);
+                    proxy -> deleteEvent(clientSocket, POLLOUT);
                     //std::cout << "close POLLOUT" << std::endl;
                 }
             }
@@ -148,26 +139,12 @@ namespace lab31 {
     }
 
     bool ClientHandler::initConnectionToDest(){
-        /*if(!RequestParser()){
-            return false;
-        }*/
-        //std::cout << url << '\n';
-        //if (!proxy->getCache()->isFullyCached(url) ) {
         if(!becomeFirstWriter()){
             return false;
         }
-        //std::cout << url + " new record created" << std::endl;
-/*        if(proxy->getCache()->isCached(url) || prVersion == "1.1"){
-            record->setDeleteAfterUse();
-        }*/
+
         initialized = true;
         return true; // подключение к серверу, отправка запроса на него
-        /*} else{
-            std::cout << "loaded from cache " << url << '\n';
-            record = proxy->getCache()->subscribe(url, clientSocket);
-            //proxy->addEvent(clientSocket, POLLOUT);
-        }*/
-        //initialized = true;
     }
 
 //"GET http://lib.pushkinskijdom.ru/Default.aspx?tabid=2018 HTTP/1.1\r\nHost: lib.pushkinskijdom.ru\r\n
@@ -181,14 +158,7 @@ namespace lab31 {
         }
 
         if (len == 0) {
-            /*//std::cout <<'/n/n/n/n/n/n'<< "Client #" + std::to_string(clientSocket) + " done writing. Closing connection" << '/n/n/n/n';
-            proxy->deleteEvent(clientSocket, POLLIN); // last
-            std::cout << "close POLLIN"<< std::endl;
-            if (firstWriter && record->getObserverCount() > 1) {
-                proxy->makeNewServer(record->getObservers());
-            }*/
-            //std::cout << " uns" << '\n';
-            proxy->getCache()->unsubscribe(url, clientSocket);
+            proxy -> getCache() -> unsubscribe(url, clientSocket);
             return false;
         }
 
@@ -196,13 +166,13 @@ namespace lab31 {
 
         if(len<BUFSIZ) {        // медленно ыыыыы
             if(record != nullptr){
-                record->setFullyCached();
-                proxy->getCache()->unsubscribe(url, clientSocket);
+                record -> setFullyCached();
+                proxy -> getCache() -> unsubscribe(url, clientSocket);
             }
             if(!RequestParser()){       // перенести парсинг и создание record сюда для протокола 1.1
                 return false;
             }
-            if (!proxy->getCache()->isFullyCached(url) ) {
+            if (!proxy -> getCache() -> isFullyCached(url) ) {
                 if (!initialized) {
                     if (!initConnectionToDest()) {
                         return false;
@@ -210,19 +180,18 @@ namespace lab31 {
                 } else {
                     writeToServer(request); // last
                 }
-                record = proxy->getCache()->addRecord(url);
+                record = proxy -> getCache() -> addRecord(url);
                 if (record == nullptr) {
                     std::cerr << "Failed to allocate new cache record for " + url;
                     proxy->stopProxy();
                     return false;
                 }
-                server->setCacheRecord(record);
-                proxy->getCache()->subscribe(url, clientSocket);
+                server -> setCacheRecord(record);
+                proxy -> getCache() -> subscribe(url, clientSocket);
             }else{
                 std::cout << "loaded from cache " << url << '\n';
-                record = proxy->getCache()->subscribe(url, clientSocket);
+                record = proxy -> getCache() -> subscribe(url, clientSocket);
                 initialized = true;
-                //proxy->addEvent(clientSocket, POLLOUT);
             }
             readPointer=0;
             request.clear();
@@ -244,15 +213,6 @@ namespace lab31 {
             return false;
         } else {
             createServer(serverSocket);
-            /*record = proxy->getCache()->addRecord(url);
-            if (record == nullptr) {
-                std::cerr << "Failed to allocate new cache record for " + url;
-                proxy->stopProxy();
-                return false;
-            }
-            createServer(serverSocket, record);
-            proxy->getCache()->subscribe(url, clientSocket);*/
-
         }
 
         if (!writeToServer(request)) {
@@ -274,38 +234,6 @@ namespace lab31 {
     }
 
     int ClientHandler::connectToServer(const std::string& host) {
-        /*struct addrinfo hints;
-        struct addrinfo* result, * rp;
-        int sfd, s;
-        // Alex: I moved assigning hints.ai_socktype after memset()
-        memset(&hints, 0, sizeof(struct addrinfo));
-        hints.ai_family = AF_INET;
-        //hint.ai_protocol = AI_PASSIVE;
-        hints.ai_socktype = SOCK_STREAM;
-        //hints.ai_socktype = SOCK_STREAM;
-        s = getaddrinfo((host+'\0').c_str(), (port+'\0').c_str(), &hints, &result);
-        if (s != 0) {
-            fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
-            exit(EXIT_FAILURE);
-        }
-        //struct hostent *hostinfo = gethostbyname(host.data());
-        int point=0;
-        for (rp = result; rp != nullptr; rp = rp->ai_next) {
-            sfd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
-            std::cout << rp->ai_addr << '\n';
-            if (sfd == -1)
-                continue;
-            if (connect(sfd, rp->ai_addr, rp->ai_addrlen) != -1)
-                break;
-            close(sfd);
-        }
-        freeaddrinfo(result);
-        if (rp == nullptr){
-            fprintf(stderr, "Could not connect\n");
-            exit(EXIT_FAILURE);
-        }
-        return sfd;*/
-
         struct addrinfo hints, *res, *result;
 
         memset(&hints, 0, sizeof(hints));
@@ -320,38 +248,17 @@ namespace lab31 {
             exit(EXIT_FAILURE);
         }
         res = result;
-        int fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+        int fd = socket(res -> ai_family, res -> ai_socktype, res -> ai_protocol);
 
         while (res != nullptr) {
-            if (connect(fd, result->ai_addr, result->ai_addrlen) == 0) {
+            if (connect(fd, result -> ai_addr, result -> ai_addrlen) == 0) {
                 return fd;
             }
-            res = res->ai_next;
+            res = res -> ai_next;
         }
 
         fprintf(stderr, "Could not connect\n");
         exit(EXIT_FAILURE);
-        /*int serverSocket;
-        if ((serverSocket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
-            std::cerr << "Failed to open new socket";
-            return -1;
-        }
-        struct hostent *hostinfo = gethostbyname(host.data());
-        if (hostinfo == nullptr) {
-            std::cerr << "Unknown host" + host;
-            close(serverSocket);
-            return -1;
-        }
-        struct sockaddr_in sockaddrIn{};
-        sockaddrIn.sin_family = AF_INET;
-        sockaddrIn.sin_port = htons(80);
-        sockaddrIn.sin_addr = *((struct in_addr *) hostinfo->h_addr);
-        if ((connect(serverSocket, (struct sockaddr *) &sockaddrIn, sizeof(sockaddrIn))) == -1) {
-            std::cerr << "Cannot connect to" + host;
-            close(serverSocket);
-            return -1;
-        }
-        return serverSocket;*/
     }
 
     void ClientHandler::resetLastField() {
@@ -360,16 +267,16 @@ namespace lab31 {
 
     void ClientHandler::createServer(int socket) {
         server = new ServerHandler(socket);
-        proxy->addNewConnection(socket, (POLLIN | POLLHUP));
-        proxy->addNewHandler(socket, server);
+        proxy -> addNewConnection(socket, (POLLIN | POLLHUP));
+        proxy -> addNewHandler(socket, server);
     }
 
     bool ClientHandler::writeToServer(const std::string &msg) {
-        ssize_t len = send(server->getSocket(), msg.data(), msg.size(), 0);
+        ssize_t len = send(server -> getSocket(), msg.data(), msg.size(), 0);
 
         if (len == -1) {
             std::cerr << "Failed to send data to server";
-            record->setBroken();
+            record -> setBroken();
             return false;
         }
         //std::cout << "req" << '\n' << msg << '\n';
