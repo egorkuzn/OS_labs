@@ -18,7 +18,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="53d26488-ea9e-4940-b736-aea5cfaaede6" name="Changes" comment="proxy class added" />
+    <list default="true" id="53d26488-ea9e-4940-b736-aea5cfaaede6" name="Changes" comment="CacheRecord class finished">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab-31/Cache/Cache.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/lab-31/Cache/Cache.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab-31/Cache/Cache.h" beforeDir="false" afterPath="$PROJECT_DIR$/lab-31/Cache/Cache.h" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -134,7 +138,7 @@
       <workItem from="1670126560972" duration="14489000" />
       <workItem from="1670145634320" duration="1755000" />
       <workItem from="1670150034867" duration="22016000" />
-      <workItem from="1670217497494" duration="4434000" />
+      <workItem from="1670217497494" duration="5113000" />
     </task>
     <task id="LOCAL-00001" summary="continue server.c writing">
       <created>1668530431037</created>
@@ -430,7 +434,35 @@
       <option name="project" value="LOCAL" />
       <updated>1670222015063</updated>
     </task>
-    <option name="localTasksCounter" value="43" />
+    <task id="LOCAL-00043" summary="handlers creation finished">
+      <created>1670222128189</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1670222128189</updated>
+    </task>
+    <task id="LOCAL-00044" summary="Cache class added">
+      <created>1670222202991</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1670222202991</updated>
+    </task>
+    <task id="LOCAL-00045" summary="CacheRecord class added">
+      <created>1670222235849</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1670222235849</updated>
+    </task>
+    <task id="LOCAL-00046" summary="CacheRecord class finished">
+      <created>1670222307766</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1670222307766</updated>
+    </task>
+    <option name="localTasksCounter" value="47" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -448,10 +480,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Works correct, final lab-27 commit" />
-    <MESSAGE value="README.md added" />
-    <MESSAGE value="Lab 31 started" />
-    <MESSAGE value="Cache class added" />
     <MESSAGE value="Cache, CacheRecord added into Cache. ConnectionHandler into Handler" />
     <MESSAGE value="Headers update" />
     <MESSAGE value="headers finished" />
@@ -473,6 +501,10 @@
     <MESSAGE value="main.cpp added" />
     <MESSAGE value="new dirs added" />
     <MESSAGE value="proxy class added" />
-    <option name="LAST_COMMIT_MESSAGE" value="proxy class added" />
+    <MESSAGE value="handlers creation finished" />
+    <MESSAGE value="Cache class added" />
+    <MESSAGE value="CacheRecord class added" />
+    <MESSAGE value="CacheRecord class finished" />
+    <option name="LAST_COMMIT_MESSAGE" value="CacheRecord class finished" />
   </component>
 </project>

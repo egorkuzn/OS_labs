@@ -7,40 +7,63 @@
 
 namespace lab31 {
 
-    class CacheRecord;
+    class Cache;
 
-    class Cache {
+// запрос и ответ на него
+    class CacheRecord {
     private:
-        std::map<std::string, CacheRecord* > cache;
-        bool ran_out_of_memory = false;
-        std::vector<int> readyObservers;
+        std::vector<int> observers; // подписчики, по идеи, если их нет, то можно удалять запись
+        Cache *cache;
+        bool is_fully_cached = false;
+        std::string data;
+        bool is_broken = false;
+        bool deleteAfterUse = false;
+        bool readyForRead = false;
+        size_t iterationsAlive = defaultIterationsAlive;
 
     public:
+        void setDeleteAfterUse(){ deleteAfterUse=true; }
+
+        bool getDeleteAfterUse(){ return deleteAfterUse; }
+
         void deleteRecord(const std::string& url);
 
-        Cache() = default;
+        size_t getIterationsAlive(){ return iterationsAlive;}
 
-        ~Cache();
+        void Iteration(){ iterationsAlive--; }
 
-        void deleteDeadRecords();
+        void recoverIterationsAlive(){ iterationsAlive = defaultIterationsAlive;}
 
-        bool isCached(const std::string &url);
+        ~CacheRecord();
 
-        CacheRecord *subscribe(const std::string &url, int socket);
+        CacheRecord(Cache *cache);
 
-        void unsubscribe(const std::string &url, int socket);
+        void setBroken() { is_broken = true; };
 
-        CacheRecord *addRecord(const std::string &url);
+        bool isBroken() const { return is_broken; };
 
-        bool isFullyCached(const std::string &url);
+        std::string read(size_t start, size_t length) const;
 
-        bool ranOutOfMemory() const { return ran_out_of_memory; };
+        void write(const std::string &);
 
-        void setRanOutOfMemory() { ran_out_of_memory = true; };
+        void addObserver(int socket);
 
-        std::vector<int> getReadyObservers();
+        void removeObserver(int socket);
 
-        void clearReadyObservers();
+        void setFullyCached();
+
+        bool isFullyCached() const { return is_fully_cached; };
+
+        size_t getDataSize() { return data.size(); };
+
+        int getObserverCount();
+
+        void setReadyForRead() { readyForRead = true; };
+
+        bool isReadyForRead() const { return readyForRead; };
+
+        std::vector<int> &getObservers() { return observers; };
+
     };
 
 } // lab31
