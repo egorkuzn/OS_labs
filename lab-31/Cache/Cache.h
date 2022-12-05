@@ -9,6 +9,8 @@
 #include <string>
 #include <vector>
 
+#include "CacheRecord.h"
+
 namespace lab31 {
 
     class CacheRecord;
