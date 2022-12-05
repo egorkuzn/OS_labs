@@ -5,6 +5,8 @@
 #ifndef OS_LABS_CACHERECORD_H
 #define OS_LABS_CACHERECORD_H
 
+#include <vector>
+
 namespace lab31 {
 
     class Cache;
