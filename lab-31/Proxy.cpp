@@ -12,14 +12,14 @@ namespace lab31 {
     }
 
     int Proxy::createProxySocket(int port) {
-        this->address.sin_port = htons(port);   /* номер порта */
-        this->address.sin_family = AF_INET;     /* семейство адресов */
-        this->address.sin_addr.s_addr = htonl(INADDR_ANY);  /* адрес IPv4 */
+        this -> address.sin_port = htons(port);   /* номер порта */
+        this -> address.sin_family = AF_INET;     /* семейство адресов */
+        this -> address.sin_addr.s_addr = htonl(INADDR_ANY);  /* адрес IPv4 */
         return socket(AF_INET, SOCK_STREAM, 0);
     }
 
     void Proxy::stopProxy(){
-        this->proxyOn = false;
+        this -> proxyOn = false;
     }
 
 
@@ -95,10 +95,10 @@ namespace lab31 {
         int selectedDescNum;
         int timeOut = 1000;
 
-        while (proxyOn && !interrupted && !cache->ranOutOfMemory()) {
+        while (proxyOn && !interrupted && !cache -> ranOutOfMemory()) {
             //std::cout << handlers.size() << '\n';
-            setPollOutEventToObservers(cache->getReadyObservers());
-            //cache->deleteDeadRecords();
+            setPollOutEventToObservers(cache -> getReadyObservers());
+            //cache -> deleteDeadRecords();
             // ждём до 100 секунд
             if ((selectedDescNum = poll(connections.data(), connections.size(), timeOut)) == -1) {
                 std::cerr << "Proxy: run poll internal error";
@@ -134,7 +134,7 @@ namespace lab31 {
                         // Проверка, как там клиент
                         ConnectionHandler* handler = handlers.at(socket);
                         //std::cout << socket << " action " << eventCount << '\n';
-                        if (!(handler->handle(connections[i].revents))) {
+                        if (!(handler -> handle(connections[i].revents))) {
                             disconnectHandler(socket);
                             //std::cerr << "Proxy: Closed connection with : " << std::to_string(connections[i].fd) << '\n';
                             //std::cout<<"close connection" << std::endl;
@@ -147,7 +147,7 @@ namespace lab31 {
 
                     }
                 }
-                cache->deleteDeadRecords();
+                cache -> deleteDeadRecords();
             }
         }
     }
@@ -168,7 +168,7 @@ namespace lab31 {
         for (auto observer : observers) {
             addEvent(observer, POLLOUT);
             auto* client = dynamic_cast<ClientHandler *>(getHandlerByFd(observer));
-            if (client != nullptr && client->tryMakeFirstWriter()){
+            if (client != nullptr && client -> tryMakeFirstWriter()){
                 return;
             }
         }
@@ -176,12 +176,12 @@ namespace lab31 {
 
     void Proxy::setPollOutEventToObservers(const std::vector<int>& observers){
         for (auto observer : observers){
-            ConnectionHandler* handler = handlers.find(observer)->second;
-            if(handler->getReadElements() < handler->getCacheRecord()->getDataSize()) {
+            ConnectionHandler* handler = handlers.find(observer) -> second;
+            if(handler -> getReadElements() < handler -> getCacheRecord() -> getDataSize()) {
                 addEvent(observer, POLLOUT);
             }
         }
-        cache->clearReadyObservers();
+        cache -> clearReadyObservers();
     }
 
     void Proxy::addEvent(int fd, short event) {
@@ -196,7 +196,7 @@ namespace lab31 {
 
 
     Proxy::Proxy(int port) {
-        this->socketDesc = createProxySocket(port);
+        this -> socketDesc = createProxySocket(port);
         if (socketDesc == -1) {
             std::cerr << "CacheProxy :: Socket creation failed. Shutting down." << '\n';
             return;
@@ -208,11 +208,10 @@ namespace lab31 {
         }
         // Добавляем мониторинг сервера
         addNewConnection(socketDesc, POLLIN | POLLHUP);
-        this->proxyOn = true;
-        this->cache = new Cache();
+        this -> proxyOn = true;
+        this -> cache = new Cache();
         //memset(&address, 0, sizeof(address));
         // настраиваем прерывание
-        sigset(SIGTERM|SIGSEGV, interruptProxy); //SIGINT
-
+        signal(SIGTERM|SIGSEGV, interruptProxy); //SIGINT
     }
 } // lab31

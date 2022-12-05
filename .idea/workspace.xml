@@ -20,10 +20,17 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="53d26488-ea9e-4940-b736-aea5cfaaede6" name="Changes" comment="ClientHandler.h formated">
+    <list default="true" id="53d26488-ea9e-4940-b736-aea5cfaaede6" name="Changes" comment="ServerHandler.h formated">
+      <change afterPath="$PROJECT_DIR$/lab-31/cmake-build-debug/Lab31" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab-31/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/lab-31/CMakeLists.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lab-31/Handlers/ClientHandler.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/lab-31/Handlers/ClientHandler.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lab-31/Handlers/ClientHandler.h" beforeDir="false" afterPath="$PROJECT_DIR$/lab-31/Handlers/ClientHandler.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab-31/Handlers/ServerHandler.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/lab-31/Handlers/ServerHandler.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab-31/Handlers/ServerHandler.h" beforeDir="false" afterPath="$PROJECT_DIR$/lab-31/Handlers/ServerHandler.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab-31/Main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/lab-31/Main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab-31/Proxy.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/lab-31/Proxy.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab-31/Proxy.h" beforeDir="false" afterPath="$PROJECT_DIR$/lab-31/Proxy.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -97,26 +104,17 @@
       <recent name="\\wsl$\Ubuntu\home\egorkuzn\egorkuzn\vscode_prjcts\OS_labs" />
     </key>
   </component>
-  <component name="RunManager" selected="CMake Application.lab31">
+  <component name="RunManager">
     <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
         <option name="CLION.EXTERNAL.BUILD" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Lab31" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Lab31" TARGET_NAME="Lab31" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Lab31" RUN_TARGET_NAME="Lab31">
+    <configuration name="Lab31" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="9000" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Lab31" TARGET_NAME="Lab31" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Lab31" RUN_TARGET_NAME="Lab31">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="lab31" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="9000" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" CONFIG_NAME="Debug" RUN_PATH="$PROJECT_DIR$/lab-31/CMakeLists.txt" EXPLICIT_BUILD_TARGET_NAME="all">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
-    <list>
-      <item itemvalue="CMake Application.lab31" />
-      <item itemvalue="CMake Application.Lab31" />
-    </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -156,14 +154,7 @@
       <workItem from="1670126560972" duration="14489000" />
       <workItem from="1670145634320" duration="1755000" />
       <workItem from="1670150034867" duration="22016000" />
-      <workItem from="1670217497494" duration="8846000" />
-    </task>
-    <task id="LOCAL-00008" summary="node.c finished">
-      <created>1668609652842</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1668609652842</updated>
+      <workItem from="1670217497494" duration="10583000" />
     </task>
     <task id="LOCAL-00009" summary="client.c codding">
       <created>1668615082274</created>
@@ -501,7 +492,14 @@
       <option name="project" value="LOCAL" />
       <updated>1670225284886</updated>
     </task>
-    <option name="localTasksCounter" value="57" />
+    <task id="LOCAL-00057" summary="ServerHandler.h formated">
+      <created>1670226767802</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1670226767802</updated>
+    </task>
+    <option name="localTasksCounter" value="58" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -519,7 +517,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="client handler done" />
     <MESSAGE value="createProxySocket method finished" />
     <MESSAGE value="proxy done" />
     <MESSAGE value="bug fix Proxy.cpp" />
@@ -544,6 +541,7 @@
     <MESSAGE value="CMakeLists.txt done | Adding libs to the headers" />
     <MESSAGE value="Cache dir classes' headers updated" />
     <MESSAGE value="ClientHandler.h formated" />
-    <option name="LAST_COMMIT_MESSAGE" value="ClientHandler.h formated" />
+    <MESSAGE value="ServerHandler.h formated" />
+    <option name="LAST_COMMIT_MESSAGE" value="ServerHandler.h formated" />
   </component>
 </project>

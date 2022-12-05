@@ -290,4 +290,8 @@ namespace lab31 {
     size_t ClientHandler::getReadElements() {
         return readPointer;
     }
+
+    ClientHandler::~ClientHandler() {
+        proxy -> getCache() -> unsubscribe(url, clientSocket);
+    }
 } // lab31

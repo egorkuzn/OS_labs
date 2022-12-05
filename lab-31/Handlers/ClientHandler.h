@@ -26,8 +26,27 @@ namespace lab31 {
     class http_parser;
 
     class ClientHandler: public ConnectionHandler{
+    private:
+        int timeAlive = 100;
+        int clientSocket;
+        Proxy *proxy;
+        std::string request;
+        std::string lastField;
+        std::string prVersion = "1.0";
+        std::string url;
+        std::string host;
+        std::string port;
+        ServerHandler *server;
+        CacheRecord *record;
+        size_t readPointer = 0;
+        bool cachingInParallel = false;
+        bool firstWriter = false;
+        bool receive();
+        bool becomeFirstWriter();
+        bool initialized = false;
+
     public:
-        ~ClientHandler() override{proxy->getCache()->unsubscribe(url, clientSocket);};
+        ~ClientHandler() override;
         explicit ClientHandler(int socket, Proxy *proxy);
         int connectToServer(const std::string& host);
         bool handle(int event) override;
@@ -48,24 +67,6 @@ namespace lab31 {
         void deleteCache() override;
         size_t getReadElements() override;
         CacheRecord* getCacheRecord() override { return record;}
-    private:
-        int timeAlive = 100;
-        int clientSocket;
-        Proxy *proxy;
-        std::string request;
-        std::string lastField;
-        std::string prVersion = "1.0";
-        std::string url;
-        std::string host;
-        std::string port;
-        ServerHandler *server;
-        CacheRecord *record;
-        size_t readPointer = 0;
-        bool cachingInParallel = false;
-        bool firstWriter = false;
-        bool receive();
-        bool becomeFirstWriter();
-        bool initialized = false;
     };
 
 } // lab31

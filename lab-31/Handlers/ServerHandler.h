@@ -6,6 +6,9 @@
 #define OS_LABS_SERVERHANDLER_H
 
 #include <poll.h>
+#include <csignal>
+#include <sys/socket.h>
+
 #include "ConnectionHandler.h"
 
 namespace lab31 {
@@ -14,7 +17,6 @@ namespace lab31 {
     private:
         int serverSocket;
         CacheRecord *cacheRecord = nullptr;
-
     public:
         void deleteCache() override{};
         CacheRecord* getCacheRecord() override { return  cacheRecord;}

@@ -12,8 +12,8 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    sigset(SIGPIPE, SIG_IGN);
-    sigset(SIGSTOP, SIG_IGN);
+    signal(SIGPIPE, SIG_IGN);
+    signal(SIGSTOP, SIG_IGN);
 
     struct sigaction act{};
     act.sa_handler = SIG_IGN;
