@@ -7,10 +7,33 @@
 
 namespace lab31 {
 
-    class ServerHandler {
+    class ServerHandler : public ConnectionHandler {
+    private:
+        int serverSocket;
+        CacheRecord *cacheRecord = nullptr;
 
+    public:
+
+        void deleteCache() override{};
+
+        CacheRecord* getCacheRecord() override { return  cacheRecord;}
+
+        ServerHandler(int socket, CacheRecord *record);
+
+        explicit ServerHandler(int socket);
+
+        void setCacheRecord(CacheRecord *record);
+
+        bool handle(int event) override;
+
+        int getSocket() const { return serverSocket; };
+
+        ~ServerHandler() override;
+
+        size_t getReadElements() override {return 0; };
+
+        bool receive();
     };
-
 } // lab31
 
 #endif //OS_LABS_SERVERHANDLER_H

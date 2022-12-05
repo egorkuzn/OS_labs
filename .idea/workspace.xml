@@ -18,10 +18,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="53d26488-ea9e-4940-b736-aea5cfaaede6" name="Changes" comment="CacheRecord class finished">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lab-31/Cache/Cache.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/lab-31/Cache/Cache.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lab-31/Cache/Cache.h" beforeDir="false" afterPath="$PROJECT_DIR$/lab-31/Cache/Cache.h" afterDir="false" />
+    <list default="true" id="53d26488-ea9e-4940-b736-aea5cfaaede6" name="Changes" comment="Connection and Client handlers headers done">
+      <change beforePath="$PROJECT_DIR$/lab-31/Handlers/ClientHandler.h" beforeDir="false" afterPath="$PROJECT_DIR$/lab-31/Handlers/ClientHandler.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab-31/Handlers/ConnectionHandler.h" beforeDir="false" afterPath="$PROJECT_DIR$/lab-31/Handlers/ConnectionHandler.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -138,7 +137,7 @@
       <workItem from="1670126560972" duration="14489000" />
       <workItem from="1670145634320" duration="1755000" />
       <workItem from="1670150034867" duration="22016000" />
-      <workItem from="1670217497494" duration="5113000" />
+      <workItem from="1670217497494" duration="5421000" />
     </task>
     <task id="LOCAL-00001" summary="continue server.c writing">
       <created>1668530431037</created>
@@ -462,7 +461,21 @@
       <option name="project" value="LOCAL" />
       <updated>1670222307766</updated>
     </task>
-    <option name="localTasksCounter" value="47" />
+    <task id="LOCAL-00047" summary="Cache classes finished">
+      <created>1670222882496</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1670222882496</updated>
+    </task>
+    <task id="LOCAL-00048" summary="Connection and Client handlers headers done">
+      <created>1670223020745</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1670223020745</updated>
+    </task>
+    <option name="localTasksCounter" value="49" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -480,8 +493,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Cache, CacheRecord added into Cache. ConnectionHandler into Handler" />
-    <MESSAGE value="Headers update" />
     <MESSAGE value="headers finished" />
     <MESSAGE value="Cache.cpp code writing start" />
     <MESSAGE value="Cache.cpp finished" />
@@ -505,6 +516,8 @@
     <MESSAGE value="Cache class added" />
     <MESSAGE value="CacheRecord class added" />
     <MESSAGE value="CacheRecord class finished" />
-    <option name="LAST_COMMIT_MESSAGE" value="CacheRecord class finished" />
+    <MESSAGE value="Cache classes finished" />
+    <MESSAGE value="Connection and Client handlers headers done" />
+    <option name="LAST_COMMIT_MESSAGE" value="Connection and Client handlers headers done" />
   </component>
 </project>
