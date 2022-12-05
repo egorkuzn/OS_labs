@@ -72,26 +72,28 @@ namespace lab31 {
     }
 
 // "GET http://lib.pushkinskijdom.ru/Default.aspx?tabid=10183 HTTP/1.1\r\nHost: lib.pushkinskijdom.ru\r\nUser-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:103.0) Gecko/20100101 Firefox/103.0\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8\r\nAccept-Language: en-US,en;q=0.5\r\nAccept-Encoding: gzip, deflate\r\nReferer: http://lib.pushkinskijdom.ru/Default.aspx?tabid=2018\r\nConnection: keep-alive\r\nCookie: .ASPXANONYMOUS=uLMKm8gi2QEkAAAAOGEwYjJhYzItNzVmMS00OTRjLTlmZjMtYjAwNzQ4MTZkYTk40; __utma=261296784.1672019940.1667117300.1667190460.1667197894.4; __utmz=261296784.1667117300.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); __utmc=261296784; language=ru-RU\r\nUpgrade-Insecure-Requests: 1\r\n\r\n"
+    size_t findFirstSpChar(std::string in) {
+        std::vector<size_t> indexes = {};
+        indexes.push_back(in.find('\n'));
+        indexes.push_back(in.find('\r'));
+        indexes.push_back(in.find(' '));
+        std::sort(indexes.begin(), indexes.end());
+
+        return indexes[0];
+    }
+
     std::string ClientHandler::getPrVersion(std::string in){
         std::string req = std::move(in);
         size_t start = req.find("HTTP/");
-        size_t end = req.find("\r\n");
-        if(start == std::string::npos || end == std::string::npos) {
-            std::cerr <<"parse Host error" << std::endl;
-            return "";
-        }
-        return req.substr(start + 5, end - start - 5);
+
+        return req.substr(start + 5, 3);
     }
 
     std::string getHost(std::string in){
         std::string req = std::move(in);
-        size_t start = req.find("Host:");
-        size_t end = req.find("User-Agent:");
-        if(start == std::string::npos || end == std::string::npos) {
-            std::cerr <<"parse Host error" << std::endl;
-            return "";
-        }
-        return req.substr(start + 6, end - start - 8);
+        std::string afterHostString = req.substr(req.find("Host:") + 6);
+        size_t end = findFirstSpChar(afterHostString);
+        return afterHostString.substr(0, end);
     }
 
     std::string ClientHandler::getUrl(std::string in){
@@ -108,28 +110,32 @@ namespace lab31 {
     std::string ClientHandler::getMethod(std::string in){
         std::string req = std::move(in);
         size_t end = req.find(' ');
+
         if(end == std::string::npos) {
             std::cerr <<"parse URL error" << std::endl;
             return "";
         }
+
         return req.substr(0, end);
     }
 
     bool ClientHandler::RequestParser(){
         prVersion = getPrVersion(request);
-        if(prVersion!="1.1" && prVersion!="1.0" ){
+        std::cout << prVersion << std::endl;
+
+        if (prVersion!="1.1" && prVersion!="1.0") {
             char NOT_ALLOWED[71] = "HTTP/1.0 505 HTTP VERSION NOT SUPPORTED\r\n\r\n HTTP Version Not Supported";
             write(clientSocket, NOT_ALLOWED, 71);
             return false;
         }
-        //std::cout << prVersion << '\n';
         std::string HTTPMethod = getMethod(request);
-        //std::cout << HTTPMethod << '\n';
-        if(HTTPMethod != "GET" && HTTPMethod != "POST"){
+        std::cout << HTTPMethod << std::endl;
+        if (HTTPMethod != "GET" && HTTPMethod != "POST") {
             char NOT_ALLOWED[59] = "HTTP/1.0 405 METHOD NOT ALLOWED\r\n\r\n Method Not Allowed";
             write(clientSocket, NOT_ALLOWED, 59);
             return false;
         }
+
         host = getHost(request);
         int place = host.find(':');
         port = host.substr(place+1, host.size()-place-1);
@@ -164,7 +170,7 @@ namespace lab31 {
 
         request.append(buffer, len);
 
-        if(len<BUFSIZ) {        // медленно ыыыыы
+        if(len < BUFSIZ) {
             if(record != nullptr){
                 record -> setFullyCached();
                 proxy -> getCache() -> unsubscribe(url, clientSocket);
@@ -193,7 +199,7 @@ namespace lab31 {
                 record = proxy -> getCache() -> subscribe(url, clientSocket);
                 initialized = true;
             }
-            readPointer=0;
+            readPointer = 0;
             request.clear();
         }
         return true;
@@ -254,6 +260,7 @@ namespace lab31 {
             if (connect(fd, result -> ai_addr, result -> ai_addrlen) == 0) {
                 return fd;
             }
+
             res = res -> ai_next;
         }
 

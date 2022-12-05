@@ -11,6 +11,7 @@
 #include <netdb.h>
 #include <cstring>
 #include <csignal>
+#include <algorithm>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
