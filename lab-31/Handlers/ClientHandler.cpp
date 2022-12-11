@@ -288,10 +288,12 @@ namespace lab31 {
         std::cout << host << ":" << port << std::endl;
 
         int errcode = getaddrinfo((host+"\0").c_str(),(port+"\0").c_str(), &hints, &result);
+
         if (errcode != 0) {
-            fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(errcode));
-            exit(EXIT_FAILURE);
+            std::cerr << "getaddrinfo: " << gai_strerror(errcode) << std::endl;
+            return -1;
         }
+
         res = result;
         int fd = socket(res -> ai_family, res -> ai_socktype, res -> ai_protocol);
 
@@ -303,8 +305,8 @@ namespace lab31 {
             res = res -> ai_next;
         }
 
-        fprintf(stderr, "Could not connect\n");
-        exit(EXIT_FAILURE);
+        std::cerr << "Could not connect" << std::endl;
+        return -1;
     }
 
     void ClientHandler::resetLastField() {

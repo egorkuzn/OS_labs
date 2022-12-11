@@ -20,16 +20,8 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cb36e24c-0645-4903-b8e2-e415f2bb2f5f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/requests.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="cb36e24c-0645-4903-b8e2-e415f2bb2f5f" name="Changes" comment="updated">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lab-31/Cache/Cache.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/lab-31/Cache/Cache.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lab-31/Cache/CacheRecord.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/lab-31/Cache/CacheRecord.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lab-31/Handlers/ClientHandler.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/lab-31/Handlers/ClientHandler.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lab-31/Handlers/ClientHandler.h" beforeDir="false" afterPath="$PROJECT_DIR$/lab-31/Handlers/ClientHandler.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lab-31/Proxy.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/lab-31/Proxy.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lab-31/cmake-build-debug/Lab31" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -91,8 +83,20 @@
       <updated>1670503830605</updated>
       <workItem from="1670503835267" duration="9887000" />
       <workItem from="1670638613356" duration="4429000" />
-      <workItem from="1670733024548" duration="3018000" />
+      <workItem from="1670733024548" duration="4619000" />
     </task>
+    <task id="LOCAL-00001" summary="updated">
+      <created>1670736718032</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1670736718032</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="updated" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated" />
   </component>
 </project>
