@@ -10,7 +10,7 @@ namespace lab31 {
     }
 
     bool Cache::isFullyCached(const std::string &url) {
-        return (isCached(url) && cache.find(url)->second->isFullyCached() && cache.find(url)->second->getIterationsAlive()!=0);
+        return (isCached(url) && cache.find(url) -> second -> isFullyCached() && cache.find(url) -> second -> getIterationsAlive()!=0);
     }
 
 
@@ -24,9 +24,9 @@ namespace lab31 {
     CacheRecord *Cache::subscribe(const std::string &url, int socket) {
         if (isCached(url)) {
             //std::cerr <<"Subscribing client #" + std::to_string(socket) + " to " + url;
-            CacheRecord* cacheRecord= cache.find(url)->second;
-            cacheRecord->addObserver(socket);
-            cacheRecord->recoverIterationsAlive();
+            CacheRecord* cacheRecord= cache.find(url) -> second;
+            cacheRecord -> addObserver(socket);
+            cacheRecord -> recoverIterationsAlive();
             return cacheRecord;
         } else {
             //std::cerr << url + " is not cached.";
@@ -38,7 +38,7 @@ namespace lab31 {
         if (!isCached(url)) {
             return;
         } else {
-            cache.find(url)->second->removeObserver(socket);
+            cache.find(url) -> second -> removeObserver(socket);
         }
     }
 
@@ -51,8 +51,8 @@ namespace lab31 {
 
     std::vector<int> Cache::getReadyObservers() {
         for (auto record : cache){
-            if (record.second->isReadyForRead()){
-                readyObservers.insert(readyObservers.end(), record.second->getObservers().begin(), record.second->getObservers().end());
+            if (record.second -> isReadyForRead()){
+                readyObservers.insert(readyObservers.end(), record.second -> getObservers().begin(), record.second -> getObservers().end());
             }
         }
         return readyObservers;
@@ -64,17 +64,17 @@ namespace lab31 {
 
     void Cache::deleteDeadRecords() {
         std::string cacheForDelete[cache.size()];
-        int i=0;
+        int i = 0;
         for (auto record : cache){
-            if (record.second->getObservers().empty() &&
-                (isFullyCached(record.first) || record.second->getDeleteAfterUse())
-                || record.second->isBroken()){
-                if(record.second->getIterationsAlive() == 0){
-                    std::cout << record.second->getObservers().size() << '\n';
+            if (record.second -> getObservers().empty() &&
+                (isFullyCached(record.first) || record.second -> getDeleteAfterUse())
+                || record.second -> isBroken()){
+                if(record.second -> getIterationsAlive() == 0){
+                    std::cout << record.second -> getObservers().size() << '\n';
                     cacheForDelete[i] = record.first;
                     i++;
                 }
-                record.second->Iteration();
+                record.second -> Iteration();
             }
         }
         for(int j = 0; j<i;j++){

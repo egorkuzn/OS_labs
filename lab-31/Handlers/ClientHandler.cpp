@@ -71,8 +71,7 @@ namespace lab31 {
 
     }
 
-// "GET http://lib.pushkinskijdom.ru/Default.aspx?tabid=10183 HTTP/1.1\r\nHost: lib.pushkinskijdom.ru\r\nUser-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:103.0) Gecko/20100101 Firefox/103.0\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8\r\nAccept-Language: en-US,en;q=0.5\r\nAccept-Encoding: gzip, deflate\r\nReferer: http://lib.pushkinskijdom.ru/Default.aspx?tabid=2018\r\nConnection: keep-alive\r\nCookie: .ASPXANONYMOUS=uLMKm8gi2QEkAAAAOGEwYjJhYzItNzVmMS00OTRjLTlmZjMtYjAwNzQ4MTZkYTk40; __utma=261296784.1672019940.1667117300.1667190460.1667197894.4; __utmz=261296784.1667117300.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); __utmc=261296784; language=ru-RU\r\nUpgrade-Insecure-Requests: 1\r\n\r\n"
-    size_t findFirstSpChar(std::string in) {
+    size_t ClientHandler::findFirstSpChar(std::string in) {
         std::vector<size_t> indexes = {};
         indexes.push_back(in.find('\n'));
         indexes.push_back(in.find('\r'));
@@ -89,22 +88,23 @@ namespace lab31 {
         return req.substr(start + 5, 3);
     }
 
-    std::string getHost(std::string in){
+    std::string ClientHandler::getHost(std::string in){
         std::string req = std::move(in);
         std::string afterHostString = req.substr(req.find("Host:") + 6);
         size_t end = findFirstSpChar(afterHostString);
         return afterHostString.substr(0, end);
     }
 
-    std::string ClientHandler::getUrl(std::string in){
+    std::string ClientHandler::getServerMethodPath(std::string in, std::string HTTPMethod) {
         std::string req = std::move(in);
-        size_t start = req.find(' ');
-        size_t end = req.find("HTTP");
-        if(start == std::string::npos || end == std::string::npos) {
-            std::cerr <<"parse URL error" << std::endl;
-            return "";
-        }
-        return req.substr(start + 1 , end - start - 2);
+        req = req.substr(req.find(HTTPMethod) + HTTPMethod.length());
+        req = req.substr(req.find('/'));
+        int start = (req[1] == '/') ? 1 : 0;
+        return req.substr(start, findFirstSpChar(req));
+    }
+
+    std::string ClientHandler::getUrl(std::string host, std::string serverMethodPath){
+        return "http://" + host + serverMethodPath;
     }
 
     std::string ClientHandler::getMethod(std::string in){
@@ -119,7 +119,23 @@ namespace lab31 {
         return req.substr(0, end);
     }
 
+    void ClientHandler::buildRequest(std::string& HTTPMethod,
+                                     std::string& serverMethodPath) {
+        request.clear();
+        request = HTTPMethod + " " + serverMethodPath + " HTTP/" + prVersion + "\r\n";
+        request += "Accept: text/html\r\n";
+        request += "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36\r\n";
+        request += "Host: " + host + "\r\n";
+        request += "Connection: keep-alive\r\n\r\n";
+    }
+
+    bool ClientHandler::isOneLineRequest() {
+        return request.find_first_of('\n') == request.find_last_of('\n');
+    }
+
     bool ClientHandler::RequestParser(){
+        if (request.size() <= 8) return false;
+
         prVersion = getPrVersion(request);
         std::cout << prVersion << std::endl;
 
@@ -137,10 +153,25 @@ namespace lab31 {
         }
 
         host = getHost(request);
-        int place = host.find(':');
-        port = host.substr(place+1, host.size()-place-1);
-        host = host.substr(0,host.find(':'));
-        url = getUrl(request);
+        std::string serverMethodPath = getServerMethodPath(request, HTTPMethod);
+        url = getUrl(host, serverMethodPath);
+        size_t place = host.find(':');
+
+        if (place != std::string::npos) {
+            port = host.substr(place + 1, host.size() - place - 1);
+            host = host.substr(0, host.find(':'));
+        } else {
+            port = "80";
+        }
+
+        std::cout << serverMethodPath << std::endl;
+        std::cout << url << std::endl;
+
+        if (isOneLineRequest()) {
+            std::cout << "One line mode detected" << std::endl;
+            buildRequest(HTTPMethod, serverMethodPath);
+        }
+
         return true;
     }
 
@@ -153,11 +184,11 @@ namespace lab31 {
         return true; // подключение к серверу, отправка запроса на него
     }
 
-//"GET http://lib.pushkinskijdom.ru/Default.aspx?tabid=2018 HTTP/1.1\r\nHost: lib.pushkinskijdom.ru\r\n
     bool ClientHandler::receive() {
         char buffer[BUFSIZ];
 
         ssize_t len = recv(clientSocket, buffer, BUFSIZ, 0);
+
         if (len < 0) {
             std::cerr << "Failed to read data from clientSocket";
             return false;
@@ -171,13 +202,15 @@ namespace lab31 {
         request.append(buffer, len);
 
         if(len < BUFSIZ) {
-            if(record != nullptr){
+            if (record != nullptr) {
                 record -> setFullyCached();
                 proxy -> getCache() -> unsubscribe(url, clientSocket);
             }
-            if(!RequestParser()){       // перенести парсинг и создание record сюда для протокола 1.1
+
+            if (!RequestParser()) {       // перенести парсинг и создание record сюда для протокола 1.1
                 return false;
             }
+
             if (!proxy -> getCache() -> isFullyCached(url) ) {
                 if (!initialized) {
                     if (!initConnectionToDest()) {
@@ -186,19 +219,23 @@ namespace lab31 {
                 } else {
                     writeToServer(request); // last
                 }
+
                 record = proxy -> getCache() -> addRecord(url);
+
                 if (record == nullptr) {
                     std::cerr << "Failed to allocate new cache record for " + url;
-                    proxy->stopProxy();
+                    proxy -> stopProxy();
                     return false;
                 }
+
                 server -> setCacheRecord(record);
                 proxy -> getCache() -> subscribe(url, clientSocket);
-            }else{
+            } else {
                 std::cout << "loaded from cache " << url << '\n';
                 record = proxy -> getCache() -> subscribe(url, clientSocket);
                 initialized = true;
             }
+
             readPointer = 0;
             request.clear();
         }
@@ -224,6 +261,7 @@ namespace lab31 {
         if (!writeToServer(request)) {
             return false;
         }
+
         return true;
     }
 
@@ -247,6 +285,7 @@ namespace lab31 {
         hints.ai_protocol = IPPROTO_TCP;
         hints.ai_socktype = SOCK_STREAM;
         hints.ai_flags |= AI_CANONNAME;
+        std::cout << host << ":" << port << std::endl;
 
         int errcode = getaddrinfo((host+"\0").c_str(),(port+"\0").c_str(), &hints, &result);
         if (errcode != 0) {
@@ -279,6 +318,8 @@ namespace lab31 {
     }
 
     bool ClientHandler::writeToServer(const std::string &msg) {
+        std::cout << msg << std::endl;
+
         ssize_t len = send(server -> getSocket(), msg.data(), msg.size(), 0);
 
         if (len == -1) {
@@ -286,7 +327,7 @@ namespace lab31 {
             record -> setBroken();
             return false;
         }
-        //std::cout << "req" << '\n' << msg << '\n';
+
         return true;
     }
 

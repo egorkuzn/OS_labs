@@ -12,16 +12,15 @@ namespace lab31 {
     }
 
     int Proxy::createProxySocket(int port) {
-        this -> address.sin_port = htons(port);   /* номер порта */
-        this -> address.sin_family = AF_INET;     /* семейство адресов */
-        this -> address.sin_addr.s_addr = htonl(INADDR_ANY);  /* адрес IPv4 */
+        this -> address.sin_port = htons(port);              /* номер порта        */
+        this -> address.sin_family = AF_INET;                         /* семейство адресов */
+        this -> address.sin_addr.s_addr = htonl(INADDR_ANY);  /* адрес IPv4        */
         return socket(AF_INET, SOCK_STREAM, 0);
     }
 
     void Proxy::stopProxy(){
         this -> proxyOn = false;
     }
-
 
     bool Proxy::initProxySocket() {
         // Связь сокета с адресом
@@ -34,7 +33,6 @@ namespace lab31 {
             std::cerr << "CacheProxy :: Failed to set non-blocking flag to socketDesc. Shutting down." << '\n';
             return false;
         }
-
         // Слушаем сокет на подключения
         if (listen(socketDesc, 510) == -1) {
             std::cerr << "CacheProxy :: listen(2) failed. Shutting down." << '\n';
@@ -52,21 +50,19 @@ namespace lab31 {
         connections.push_back(fd);
     }
 
-
-
     ConnectionHandler* Proxy::getHandlerByFd(int fd){
         ConnectionHandler* handler;
+
         try {
             handler = handlers.at(fd);
         } catch (std::out_of_range &e) {
             return nullptr;
         }
+
         return handler;
     }
 
     void Proxy::disconnectHandler(int socket) {
-        //std::cerr << "Closing #" << std::to_string(socket);
-
         for (auto iter = connections.begin(); iter != connections.end(); ++iter) {
             if ((*iter).fd == socket) {
                 connections.erase(iter);
@@ -120,7 +116,7 @@ namespace lab31 {
                     // Добавляем мониторинг клиента
                     addNewConnection(newClientFD, POLLIN | POLLHUP);
                     // Обрабатываем(отрабатываем) клиента
-                    auto *client = (ConnectionHandler *)new ClientHandler(newClientFD, this);
+                    auto *client = (ConnectionHandler*) new ClientHandler(newClientFD, this);
                     // добавляем клиента в список клиентов
                     addNewHandler(newClientFD, client);
                     std::cout << "Proxy: Accepted new connection from client : " << std::to_string(newClientFD) << '\n';
@@ -144,9 +140,9 @@ namespace lab31 {
                         }
 
                         connections[i].revents = 0;
-
                     }
                 }
+
                 cache -> deleteDeadRecords();
             }
         }
@@ -167,20 +163,22 @@ namespace lab31 {
     void Proxy::makeNewServer(const std::vector<int>& observers) {
         for (auto observer : observers) {
             addEvent(observer, POLLOUT);
-            auto* client = dynamic_cast<ClientHandler *>(getHandlerByFd(observer));
+            auto* client = dynamic_cast<ClientHandler*>(getHandlerByFd(observer));
+
             if (client != nullptr && client -> tryMakeFirstWriter()){
                 return;
             }
         }
     }
 
-    void Proxy::setPollOutEventToObservers(const std::vector<int>& observers){
+    void Proxy::setPollOutEventToObservers(const std::vector<int>& observers) {
         for (auto observer : observers){
             ConnectionHandler* handler = handlers.find(observer) -> second;
             if(handler -> getReadElements() < handler -> getCacheRecord() -> getDataSize()) {
                 addEvent(observer, POLLOUT);
             }
         }
+
         cache -> clearReadyObservers();
     }
 
@@ -188,15 +186,16 @@ namespace lab31 {
         for (auto &connection : connections) {
             if (connection.fd == fd) {
                 connection.events |= event;
+                connection.events |= event;
                 break;
             }
         }
-
     }
 
 
     Proxy::Proxy(int port) {
         this -> socketDesc = createProxySocket(port);
+
         if (socketDesc == -1) {
             std::cerr << "CacheProxy :: Socket creation failed. Shutting down." << '\n';
             return;

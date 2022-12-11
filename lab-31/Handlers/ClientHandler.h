@@ -62,12 +62,17 @@ namespace lab31 {
         bool tryMakeFirstWriter();
         bool RequestParser();
         bool initConnectionToDest();
-        static std::string getUrl(std::string in);
         static std::string getMethod(std::string in);
         static std::string getPrVersion(std::string in);
         void deleteCache() override;
         size_t getReadElements() override;
         CacheRecord* getCacheRecord() override { return record;}
+        std::string getUrl(std::string host, std::string serverMethodPath);
+        std::string getServerMethodPath(std::string in, std::string serverMethodPath);
+        size_t findFirstSpChar(std::string in);
+        std::string getHost(std::string in);
+        void buildRequest(std::string &HTTPMethod, std::string &serverMethodPath);
+        bool isOneLineRequest();
     };
 
 } // lab31

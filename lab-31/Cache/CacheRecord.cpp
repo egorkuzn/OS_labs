@@ -29,7 +29,7 @@ namespace lab31 {
         }
     }
 
-    void CacheRecord::write(const std::string &str) {// хз как сделать лучше мммммм
+    void CacheRecord::write(const std::string &str) {
         try {
             data.append(str);
         }
@@ -59,6 +59,5 @@ namespace lab31 {
 
     void CacheRecord::deleteRecord(const std::string& url) {
         cache->deleteRecord(url);
-
     }
 } // lab31

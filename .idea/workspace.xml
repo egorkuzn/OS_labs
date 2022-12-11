@@ -14,51 +14,31 @@
       <config projectName="Lab31" targetName="Lab31" />
     </generated>
   </component>
-  <component name="CMakeSettings" AUTO_RELOAD="true">
+  <component name="CMakeSettings">
     <configurations>
       <configuration PROFILE_NAME="Debug" ENABLED="true" CONFIG_NAME="Debug" />
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="53d26488-ea9e-4940-b736-aea5cfaaede6" name="Changes" comment="Final commit">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="cb36e24c-0645-4903-b8e2-e415f2bb2f5f" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/requests.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab-31/Cache/Cache.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/lab-31/Cache/Cache.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab-31/Cache/CacheRecord.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/lab-31/Cache/CacheRecord.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lab-31/Handlers/ClientHandler.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/lab-31/Handlers/ClientHandler.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lab-31/Handlers/ClientHandler.h" beforeDir="false" afterPath="$PROJECT_DIR$/lab-31/Handlers/ClientHandler.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lab-31/cmake-build-debug/Lab31" beforeDir="false" afterPath="$PROJECT_DIR$/lab-31/cmake-build-debug/Lab31" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab-31/Proxy.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/lab-31/Proxy.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab-31/cmake-build-debug/Lab31" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ClangdSettings">
-    <option name="formatViaClangd" value="false" />
-    <option name="clangWarnings" value="-Wno-unused-variable,-Wno-infinite-recursion,-Wno-array-bounds,-Werror=implicit-function-declaration,-Wshadow,-Wno-shadow-field-in-constructor-modified,-Wno-shadow-ivar,-Wuninitialized,-Wunused-label,-Wunused-lambda-capture,-Wno-parentheses" />
-  </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="CMakeLists.txt" />
-      </list>
-    </option>
-  </component>
-  <component name="Git.Rebase.Settings">
-    <option name="NEW_BASE" value="master" />
-  </component>
   <component name="Git.Settings">
-    <option name="RECENT_BRANCH_BY_REPOSITORY">
-      <map>
-        <entry key="$PROJECT_DIR$" value="master" />
-      </map>
-    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-    <option name="ROOT_SYNC" value="SYNC" />
-  </component>
-  <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/../../../../../usr/include/c++/11/bits/stl_map.h" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/../../../../../usr/include/c++/11/ostream" root0="SKIP_INSPECTION" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -66,477 +46,53 @@
   <component name="ProjectApplicationVersion">
     <option name="ide" value="CLion" />
     <option name="majorVersion" value="2022" />
-    <option name="minorVersion" value="2.4" />
+    <option name="minorVersion" value="3" />
   </component>
-  <component name="ProjectId" id="2HZyUkXP8fqpwSw6ZnK3ry3iLDG" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectId" id="2IdG1PEuFjzyoOfTi2KKofavkNb" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "last_opened_file_path": "//wsl$/Ubuntu/home/egorkuzn/egorkuzn/vscode_prjcts/OS_labs",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "structure.view.defaults.are.configured": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;//wsl$/Ubuntu/home/egorkuzn/egorkuzn/vscode_prjcts/OS_labs/lab-31/Main.cpp&quot;
   }
-}]]></component>
-  <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="\\wsl$\Ubuntu\home\egorkuzn\egorkuzn\vscode_prjcts\OS_labs\lab-31" />
-      <recent name="\\wsl$\Ubuntu\home\egorkuzn\egorkuzn\vscode_prjcts\OS_labs" />
-    </key>
-  </component>
-  <component name="RunManager">
-    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
-      </method>
-    </configuration>
+}</component>
+  <component name="RunManager" selected="CMake Application.Lab31">
     <configuration name="Lab31" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="9000" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Lab31" TARGET_NAME="Lab31" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Lab31" RUN_TARGET_NAME="Lab31">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
+    <configuration name="Main.cpp - WSL" type="CppFileRunConfiguration" factoryName="CppFileRunConfiguration" nameIsGenerated="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Lab31" TARGET_NAME="Main.cpp - WSL" CONFIG_NAME="Main.cpp - WSL">
+      <option name="sourceFile" value="\\wsl$\Ubuntu\home\egorkuzn\egorkuzn\vscode_prjcts\OS_labs\lab-31\Main.cpp" />
+      <option name="toolchainName" value="WSL" />
+      <method v="2">
+        <option name="com.jetbrains.cidr.cpp.runfile.CppFileBuildBeforeRunTaskProvider$BasicBuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="C/C++ File.Main.cpp - WSL" />
+      <item itemvalue="CMake Application.Lab31" />
+    </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="53d26488-ea9e-4940-b736-aea5cfaaede6" name="Changes" comment="" />
-      <created>1668506928904</created>
+      <changelist id="cb36e24c-0645-4903-b8e2-e415f2bb2f5f" name="Changes" comment="" />
+      <created>1670503830605</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1668506928904</updated>
-      <workItem from="1668506936203" duration="2573000" />
-      <workItem from="1668526131741" duration="13149000" />
-      <workItem from="1668542868672" duration="192000" />
-      <workItem from="1668583343036" duration="3063000" />
-      <workItem from="1668586812240" duration="1802000" />
-      <workItem from="1668603685549" duration="12951000" />
-      <workItem from="1668617529553" duration="1156000" />
-      <workItem from="1668618984970" duration="6228000" />
-      <workItem from="1668649952442" duration="33000" />
-      <workItem from="1668653807251" duration="2124000" />
-      <workItem from="1668665965367" duration="742000" />
-      <workItem from="1668669887259" duration="1190000" />
-      <workItem from="1668938693644" duration="18505000" />
-      <workItem from="1669008227313" duration="12120000" />
-      <workItem from="1669029529188" duration="3916000" />
-      <workItem from="1669042729587" duration="126000" />
-      <workItem from="1669099249973" duration="414000" />
-      <workItem from="1669543621339" duration="54000" />
-      <workItem from="1669613039284" duration="7053000" />
-      <workItem from="1669626433466" duration="155000" />
-      <workItem from="1669634779524" duration="4509000" />
-      <workItem from="1669639386236" duration="9000" />
-      <workItem from="1669860243665" duration="9000" />
-      <workItem from="1670056334132" duration="7308000" />
-      <workItem from="1670064677938" duration="3057000" />
-      <workItem from="1670068705579" duration="2154000" />
-      <workItem from="1670070920995" duration="15380000" />
-      <workItem from="1670126560972" duration="14489000" />
-      <workItem from="1670145634320" duration="1755000" />
-      <workItem from="1670150034867" duration="22016000" />
-      <workItem from="1670217497494" duration="14270000" />
+      <updated>1670503830605</updated>
+      <workItem from="1670503835267" duration="9887000" />
+      <workItem from="1670638613356" duration="4429000" />
+      <workItem from="1670733024548" duration="3018000" />
     </task>
-    <task id="LOCAL-00010" summary="final commit for this day| it no workes">
-      <created>1668619028011</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1668619028011</updated>
-    </task>
-    <task id="LOCAL-00011" summary="removed input from while">
-      <created>1668654093812</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1668654093812</updated>
-    </task>
-    <task id="LOCAL-00012" summary="bug fixed!!! all work!!!">
-      <created>1669019177416</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1669019177416</updated>
-    </task>
-    <task id="LOCAL-00013" summary="monday commit">
-      <created>1669042812601</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1669042812601</updated>
-    </task>
-    <task id="LOCAL-00014" summary="Works correct, final lab-27 commit">
-      <created>1669618687156</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1669618687157</updated>
-    </task>
-    <task id="LOCAL-00015" summary="README.md added">
-      <created>1669619641902</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
-      <option name="project" value="LOCAL" />
-      <updated>1669619641902</updated>
-    </task>
-    <task id="LOCAL-00016" summary="Lab 31 started">
-      <created>1669635708170</created>
-      <option name="number" value="00016" />
-      <option name="presentableId" value="LOCAL-00016" />
-      <option name="project" value="LOCAL" />
-      <updated>1669635708170</updated>
-    </task>
-    <task id="LOCAL-00017" summary="Cache class added">
-      <created>1669636595221</created>
-      <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
-      <option name="project" value="LOCAL" />
-      <updated>1669636595221</updated>
-    </task>
-    <task id="LOCAL-00018" summary="Cache, CacheRecord added into Cache. ConnectionHandler into Handler">
-      <created>1669637238221</created>
-      <option name="number" value="00018" />
-      <option name="presentableId" value="LOCAL-00018" />
-      <option name="project" value="LOCAL" />
-      <updated>1669637238221</updated>
-    </task>
-    <task id="LOCAL-00019" summary="Headers update">
-      <created>1670058666048</created>
-      <option name="number" value="00019" />
-      <option name="presentableId" value="LOCAL-00019" />
-      <option name="project" value="LOCAL" />
-      <updated>1670058666048</updated>
-    </task>
-    <task id="LOCAL-00020" summary="headers finished">
-      <created>1670062287268</created>
-      <option name="number" value="00020" />
-      <option name="presentableId" value="LOCAL-00020" />
-      <option name="project" value="LOCAL" />
-      <updated>1670062287268</updated>
-    </task>
-    <task id="LOCAL-00021" summary="Cache.cpp code writing start">
-      <created>1670066514301</created>
-      <option name="number" value="00021" />
-      <option name="presentableId" value="LOCAL-00021" />
-      <option name="project" value="LOCAL" />
-      <updated>1670066514301</updated>
-    </task>
-    <task id="LOCAL-00022" summary="Cache.cpp finished">
-      <created>1670069964063</created>
-      <option name="number" value="00022" />
-      <option name="presentableId" value="LOCAL-00022" />
-      <option name="project" value="LOCAL" />
-      <updated>1670069964063</updated>
-    </task>
-    <task id="LOCAL-00023" summary="Cache record .h and .cpp files finished">
-      <created>1670074512780</created>
-      <option name="number" value="00023" />
-      <option name="presentableId" value="LOCAL-00023" />
-      <option name="project" value="LOCAL" />
-      <updated>1670074512780</updated>
-    </task>
-    <task id="LOCAL-00024" summary="Server handler done, client started">
-      <created>1670081324784</created>
-      <option name="number" value="00024" />
-      <option name="presentableId" value="LOCAL-00024" />
-      <option name="project" value="LOCAL" />
-      <updated>1670081324784</updated>
-    </task>
-    <task id="LOCAL-00025" summary="Continue handlers writing">
-      <created>1670086612790</created>
-      <option name="number" value="00025" />
-      <option name="presentableId" value="LOCAL-00025" />
-      <option name="project" value="LOCAL" />
-      <updated>1670086612790</updated>
-    </task>
-    <task id="LOCAL-00026" summary="Coming to end of client handler coding ...">
-      <created>1670127903669</created>
-      <option name="number" value="00026" />
-      <option name="presentableId" value="LOCAL-00026" />
-      <option name="project" value="LOCAL" />
-      <updated>1670127903669</updated>
-    </task>
-    <task id="LOCAL-00027" summary="Connect to the server function finished">
-      <created>1670133779415</created>
-      <option name="number" value="00027" />
-      <option name="presentableId" value="LOCAL-00027" />
-      <option name="project" value="LOCAL" />
-      <updated>1670133779415</updated>
-    </task>
-    <task id="LOCAL-00028" summary="client handler done">
-      <created>1670137107228</created>
-      <option name="number" value="00028" />
-      <option name="presentableId" value="LOCAL-00028" />
-      <option name="project" value="LOCAL" />
-      <updated>1670137107228</updated>
-    </task>
-    <task id="LOCAL-00029" summary="createProxySocket method finished">
-      <created>1670141765567</created>
-      <option name="number" value="00029" />
-      <option name="presentableId" value="LOCAL-00029" />
-      <option name="project" value="LOCAL" />
-      <updated>1670141765567</updated>
-    </task>
-    <task id="LOCAL-00030" summary="proxy done">
-      <created>1670146938860</created>
-      <option name="number" value="00030" />
-      <option name="presentableId" value="LOCAL-00030" />
-      <option name="project" value="LOCAL" />
-      <updated>1670146938860</updated>
-    </task>
-    <task id="LOCAL-00031" summary="bug fix Proxy.cpp">
-      <created>1670146965560</created>
-      <option name="number" value="00031" />
-      <option name="presentableId" value="LOCAL-00031" />
-      <option name="project" value="LOCAL" />
-      <updated>1670146965560</updated>
-    </task>
-    <task id="LOCAL-00032" summary="namespace update">
-      <created>1670218725109</created>
-      <option name="number" value="00032" />
-      <option name="presentableId" value="LOCAL-00032" />
-      <option name="project" value="LOCAL" />
-      <updated>1670218725109</updated>
-    </task>
-    <task id="LOCAL-00033" summary="cmake replacement">
-      <created>1670218952576</created>
-      <option name="number" value="00033" />
-      <option name="presentableId" value="LOCAL-00033" />
-      <option name="project" value="LOCAL" />
-      <updated>1670218952576</updated>
-    </task>
-    <task id="LOCAL-00034" summary="force commit">
-      <created>1670221012677</created>
-      <option name="number" value="00034" />
-      <option name="presentableId" value="LOCAL-00034" />
-      <option name="project" value="LOCAL" />
-      <updated>1670221012677</updated>
-    </task>
-    <task id="LOCAL-00035" summary="force commit">
-      <created>1670221019874</created>
-      <option name="number" value="00035" />
-      <option name="presentableId" value="LOCAL-00035" />
-      <option name="project" value="LOCAL" />
-      <updated>1670221019874</updated>
-    </task>
-    <task id="LOCAL-00036" summary="force commit">
-      <created>1670221031179</created>
-      <option name="number" value="00036" />
-      <option name="presentableId" value="LOCAL-00036" />
-      <option name="project" value="LOCAL" />
-      <updated>1670221031179</updated>
-    </task>
-    <task id="LOCAL-00037" summary="force commit">
-      <created>1670221229237</created>
-      <option name="number" value="00037" />
-      <option name="presentableId" value="LOCAL-00037" />
-      <option name="project" value="LOCAL" />
-      <updated>1670221229237</updated>
-    </task>
-    <task id="LOCAL-00038" summary="force commit">
-      <created>1670221435407</created>
-      <option name="number" value="00038" />
-      <option name="presentableId" value="LOCAL-00038" />
-      <option name="project" value="LOCAL" />
-      <updated>1670221435407</updated>
-    </task>
-    <task id="LOCAL-00039" summary="from the clear list ...">
-      <created>1670221741782</created>
-      <option name="number" value="00039" />
-      <option name="presentableId" value="LOCAL-00039" />
-      <option name="project" value="LOCAL" />
-      <updated>1670221741782</updated>
-    </task>
-    <task id="LOCAL-00040" summary="main.cpp added">
-      <created>1670221893892</created>
-      <option name="number" value="00040" />
-      <option name="presentableId" value="LOCAL-00040" />
-      <option name="project" value="LOCAL" />
-      <updated>1670221893892</updated>
-    </task>
-    <task id="LOCAL-00041" summary="new dirs added">
-      <created>1670221962030</created>
-      <option name="number" value="00041" />
-      <option name="presentableId" value="LOCAL-00041" />
-      <option name="project" value="LOCAL" />
-      <updated>1670221962030</updated>
-    </task>
-    <task id="LOCAL-00042" summary="proxy class added">
-      <created>1670222015063</created>
-      <option name="number" value="00042" />
-      <option name="presentableId" value="LOCAL-00042" />
-      <option name="project" value="LOCAL" />
-      <updated>1670222015063</updated>
-    </task>
-    <task id="LOCAL-00043" summary="handlers creation finished">
-      <created>1670222128189</created>
-      <option name="number" value="00043" />
-      <option name="presentableId" value="LOCAL-00043" />
-      <option name="project" value="LOCAL" />
-      <updated>1670222128189</updated>
-    </task>
-    <task id="LOCAL-00044" summary="Cache class added">
-      <created>1670222202991</created>
-      <option name="number" value="00044" />
-      <option name="presentableId" value="LOCAL-00044" />
-      <option name="project" value="LOCAL" />
-      <updated>1670222202991</updated>
-    </task>
-    <task id="LOCAL-00045" summary="CacheRecord class added">
-      <created>1670222235849</created>
-      <option name="number" value="00045" />
-      <option name="presentableId" value="LOCAL-00045" />
-      <option name="project" value="LOCAL" />
-      <updated>1670222235849</updated>
-    </task>
-    <task id="LOCAL-00046" summary="CacheRecord class finished">
-      <created>1670222307766</created>
-      <option name="number" value="00046" />
-      <option name="presentableId" value="LOCAL-00046" />
-      <option name="project" value="LOCAL" />
-      <updated>1670222307766</updated>
-    </task>
-    <task id="LOCAL-00047" summary="Cache classes finished">
-      <created>1670222882496</created>
-      <option name="number" value="00047" />
-      <option name="presentableId" value="LOCAL-00047" />
-      <option name="project" value="LOCAL" />
-      <updated>1670222882496</updated>
-    </task>
-    <task id="LOCAL-00048" summary="Connection and Client handlers headers done">
-      <created>1670223020745</created>
-      <option name="number" value="00048" />
-      <option name="presentableId" value="LOCAL-00048" />
-      <option name="project" value="LOCAL" />
-      <updated>1670223020745</updated>
-    </task>
-    <task id="LOCAL-00049" summary="ServerHandler header done">
-      <created>1670223097461</created>
-      <option name="number" value="00049" />
-      <option name="presentableId" value="LOCAL-00049" />
-      <option name="project" value="LOCAL" />
-      <updated>1670223097461</updated>
-    </task>
-    <task id="LOCAL-00050" summary="ClientHandler.cpp done">
-      <created>1670223158045</created>
-      <option name="number" value="00050" />
-      <option name="presentableId" value="LOCAL-00050" />
-      <option name="project" value="LOCAL" />
-      <updated>1670223158045</updated>
-    </task>
-    <task id="LOCAL-00051" summary="ServerHandler.cpp coding finished">
-      <created>1670223937974</created>
-      <option name="number" value="00051" />
-      <option name="presentableId" value="LOCAL-00051" />
-      <option name="project" value="LOCAL" />
-      <updated>1670223937974</updated>
-    </task>
-    <task id="LOCAL-00052" summary="Proxy.h done">
-      <created>1670224010708</created>
-      <option name="number" value="00052" />
-      <option name="presentableId" value="LOCAL-00052" />
-      <option name="project" value="LOCAL" />
-      <updated>1670224010708</updated>
-    </task>
-    <task id="LOCAL-00053" summary="Proxy codding finished, Main.cpp fixed">
-      <created>1670224077151</created>
-      <option name="number" value="00053" />
-      <option name="presentableId" value="LOCAL-00053" />
-      <option name="project" value="LOCAL" />
-      <updated>1670224077151</updated>
-    </task>
-    <task id="LOCAL-00054" summary="CMakeLists.txt done | Adding libs to the headers">
-      <created>1670224817275</created>
-      <option name="number" value="00054" />
-      <option name="presentableId" value="LOCAL-00054" />
-      <option name="project" value="LOCAL" />
-      <updated>1670224817275</updated>
-    </task>
-    <task id="LOCAL-00055" summary="Cache dir classes' headers updated">
-      <created>1670225140367</created>
-      <option name="number" value="00055" />
-      <option name="presentableId" value="LOCAL-00055" />
-      <option name="project" value="LOCAL" />
-      <updated>1670225140367</updated>
-    </task>
-    <task id="LOCAL-00056" summary="ClientHandler.h formated">
-      <created>1670225284886</created>
-      <option name="number" value="00056" />
-      <option name="presentableId" value="LOCAL-00056" />
-      <option name="project" value="LOCAL" />
-      <updated>1670225284886</updated>
-    </task>
-    <task id="LOCAL-00057" summary="ServerHandler.h formated">
-      <created>1670226767802</created>
-      <option name="number" value="00057" />
-      <option name="presentableId" value="LOCAL-00057" />
-      <option name="project" value="LOCAL" />
-      <updated>1670226767802</updated>
-    </task>
-    <task id="LOCAL-00058" summary="Final commit">
-      <created>1670228442199</created>
-      <option name="number" value="00058" />
-      <option name="presentableId" value="LOCAL-00058" />
-      <option name="project" value="LOCAL" />
-      <updated>1670228442199</updated>
-    </task>
-    <option name="localTasksCounter" value="59" />
     <servers />
-  </component>
-  <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="3" />
-  </component>
-  <component name="Vcs.Log.Tabs.Properties">
-    <option name="TAB_STATES">
-      <map>
-        <entry key="MAIN">
-          <value>
-            <State />
-          </value>
-        </entry>
-      </map>
-    </option>
-  </component>
-  <component name="VcsManagerConfiguration">
-    <MESSAGE value="proxy done" />
-    <MESSAGE value="bug fix Proxy.cpp" />
-    <MESSAGE value="namespace update" />
-    <MESSAGE value="cmake replacement" />
-    <MESSAGE value="force commit" />
-    <MESSAGE value="from the clear list ..." />
-    <MESSAGE value="main.cpp added" />
-    <MESSAGE value="new dirs added" />
-    <MESSAGE value="proxy class added" />
-    <MESSAGE value="handlers creation finished" />
-    <MESSAGE value="Cache class added" />
-    <MESSAGE value="CacheRecord class added" />
-    <MESSAGE value="CacheRecord class finished" />
-    <MESSAGE value="Cache classes finished" />
-    <MESSAGE value="Connection and Client handlers headers done" />
-    <MESSAGE value="ServerHandler header done" />
-    <MESSAGE value="ClientHandler.cpp done" />
-    <MESSAGE value="ServerHandler.cpp coding finished" />
-    <MESSAGE value="Proxy.h done" />
-    <MESSAGE value="Proxy codding finished, Main.cpp fixed" />
-    <MESSAGE value="CMakeLists.txt done | Adding libs to the headers" />
-    <MESSAGE value="Cache dir classes' headers updated" />
-    <MESSAGE value="ClientHandler.h formated" />
-    <MESSAGE value="ServerHandler.h formated" />
-    <MESSAGE value="Final commit" />
-    <option name="LAST_COMMIT_MESSAGE" value="Final commit" />
   </component>
 </project>
