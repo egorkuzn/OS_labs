@@ -46,7 +46,8 @@ namespace lab31 {
         for (const auto& record : cache){
             delete record.second;
         }
-        std::cerr << "Cache deleted";
+
+        std::cerr << "Cache deleted" << std::endl;
     }
 
     std::vector<int> Cache::getReadyObservers() {

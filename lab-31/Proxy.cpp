@@ -97,9 +97,8 @@ namespace lab31 {
             //cache -> deleteDeadRecords();
             // ждём до 100 секунд
             if ((selectedDescNum = poll(connections.data(), connections.size(), timeOut)) == -1) {
-                std::cerr << "Proxy: run poll internal error";
-                return;
-
+                std::cerr << "Proxy: run poll internal error" << std::endl;
+                break;
             }
             // проверяем успешность вызова
             if (selectedDescNum > 0) {
@@ -126,6 +125,7 @@ namespace lab31 {
                 for (int i = 1; i < connections.size(); ++i) {
                     short eventCount = connections[i].revents;
                     int socket = (int)connections[i].fd;
+
                     if (eventCount > 0) {
                         // Проверка, как там клиент
                         ConnectionHandler* handler = handlers.at(socket);
@@ -156,6 +156,7 @@ namespace lab31 {
         for (auto handler : handlers) {
             disconnectHandler(handler.first);
         }
+
         close(socketDesc);
         delete cache;
     }
