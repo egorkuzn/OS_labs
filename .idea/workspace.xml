@@ -20,7 +20,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cb36e24c-0645-4903-b8e2-e415f2bb2f5f" name="Changes" comment="Lab32: comments update" />
+    <list default="true" id="cb36e24c-0645-4903-b8e2-e415f2bb2f5f" name="Changes" comment="Lab32: modified for GET &lt;host&gt;/&lt;method_path&gt;" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -36,6 +36,7 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="REBASE" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -51,23 +52,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "cidr.known.project.marker": "true",
-    "last_opened_file_path": "//wsl$/Ubuntu/home/egorkuzn/egorkuzn/vscode_prjcts/OS_labs/lab-31",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;//wsl$/Ubuntu/home/egorkuzn/egorkuzn/vscode_prjcts/OS_labs/lab-31&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.DirectoryMappings&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="\\wsl$\Ubuntu\home\egorkuzn\egorkuzn\vscode_prjcts\OS_labs\lab-31" />
@@ -78,12 +79,12 @@
     </key>
   </component>
   <component name="RunManager">
-    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+    <configuration name="Lab32" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="9001" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Lab32" TARGET_NAME="Lab32" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Lab32" RUN_TARGET_NAME="Lab32">
       <method v="2">
-        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Lab32" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="9000" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Lab32" TARGET_NAME="Lab32" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Lab32" RUN_TARGET_NAME="Lab32">
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -103,6 +104,7 @@
       <workItem from="1670843018351" duration="155000" />
       <workItem from="1671290489701" duration="66000" />
       <workItem from="1671341965180" duration="15924000" />
+      <workItem from="1671366509852" duration="7383000" />
     </task>
     <task id="LOCAL-00001" summary="updated">
       <created>1670736718032</created>
@@ -160,7 +162,14 @@
       <option name="project" value="LOCAL" />
       <updated>1671358202381</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Lab32: modified for GET &lt;host&gt;/&lt;method_path&gt;">
+      <created>1671374207907</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1671374207907</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -187,6 +196,7 @@
     <MESSAGE value="Logger added. 32-lab codding" />
     <MESSAGE value="Lab32: telnet mode activated" />
     <MESSAGE value="Lab32: comments update" />
-    <option name="LAST_COMMIT_MESSAGE" value="Lab32: comments update" />
+    <MESSAGE value="Lab32: modified for GET &lt;host&gt;/&lt;method_path&gt;" />
+    <option name="LAST_COMMIT_MESSAGE" value="Lab32: modified for GET &lt;host&gt;/&lt;method_path&gt;" />
   </component>
 </project>

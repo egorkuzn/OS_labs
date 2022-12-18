@@ -14,76 +14,77 @@
 #define timeOut 1000
 #define my_delete(x) {delete x; x = NULL;}
 
+namespace lab32 {
 
-class ClientHandler {
-private:
-    std::string request;
-    std::string prVersion;
-    int clientSocket;
-    std::string lastField;
-    std::string url;
-    std::string host;
-    std::string port="80";
-    std::string errorMsg;
-    std::string headers;
-    bool isConnected = false;
-    pthread_t serverThread;
-    Cache* cache;
-    CacheRecord *record;
-    size_t readPointer = 0;
-    bool initialized = false;
-    int serverSocket;
+    class ClientHandler {
+    private:
+        std::string request;
+        std::string prVersion;
+        int clientSocket;
+        std::string lastField;
+        std::string url;
+        std::string host;
+        std::string port = "80";
+        std::string errorMsg;
+        std::string headers;
+        bool isConnected = false;
+        pthread_t serverThread;
+        Cache *cache;
+        CacheRecord *record;
+        size_t readPointer = 0;
+        bool initialized = false;
+        int serverSocket;
+        static bool
+        createServer(ClientHandler *client, CacheRecord *record, const std::string &host, const std::string &request);
+        static int connectToServer(ClientHandler *client);
 
-    static bool createServer(ClientHandler* client, CacheRecord *record, const std::string &host, const std::string &request);\
+    public:
 
-    static int connectToServer(ClientHandler* client);
+        void deleteEvent(pollfd *conn, short event);
 
-public:
+        void setCache(Cache *cache);
 
-    void deleteEvent(pollfd* conn, short event);
+        void setServerThread(pthread_t serverThread);
 
-    void setCache(Cache *cache);
+        explicit ClientHandler(int socket);
 
-    void setServerThread(pthread_t serverThread);
+        bool readFromCache(pollfd *connection);
 
-    explicit ClientHandler(int socket);
+        const std::string &getErrorMsg() const { return errorMsg; };
 
-    bool readFromCache(pollfd* connection);
+        int getSocket() const { return clientSocket; };
 
-    const std::string &getErrorMsg() const{return errorMsg;};
+        bool receive(ClientHandler *client);
 
-    int getSocket() const { return clientSocket; };
+        static void *clientHandlerRoutine(void *args);
 
-    bool receive(ClientHandler* client);
+        static std::string getPrVersion(std::string in);
 
-    static void *clientHandlerRoutine(void *args);
+        static std::string getUrl(std::string in);
 
-    static std::string getPrVersion(std::string in);
+        static std::string getMethod(std::string in);
 
-    static std::string getUrl(std::string in);
+        bool RequestParser();
 
-    static std::string getMethod(std::string in);
+        bool sendRequest(const std::string &request) const;
 
-    bool RequestParser();
+        short returnRead(pollfd *conn);
 
-    bool sendRequest(const std::string &request) const;
+        bool isOneLineRequest();
 
-    short returnRead(pollfd* conn);
+        void buildRequest(std::string &HTTPMethod, std::string &serverMethodPath);
 
-    bool isOneLineRequest();
+        std::string getUrl(std::string host, std::string serverMethodPath);
 
-    void buildRequest(std::string &HTTPMethod, std::string &serverMethodPath);
+        std::string getServerMethodPath(std::string in, std::string HTTPMethod);
 
-    std::string getUrl(std::string host, std::string serverMethodPath);
+        std::string getHost(std::string in);
 
-    std::string getServerMethodPath(std::string in, std::string HTTPMethod);
+        size_t findFirstSpChar(std::string in);
 
-    std::string getHost(std::string in);
+        void changeRequestMethodPath(std::string host);
+    };
 
-    size_t findFirstSpChar(std::string in);
-
-    void changeRequestMethodPath(std::string host);
-};
-
+}
 
 #endif //LAB32_CLIENTHANDLER_H

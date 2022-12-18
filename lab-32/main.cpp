@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
 
     std::cout << "STARTING PROXY ON PORT " << argv[1] << std::endl;
 
-    auto proxy = new Proxy(atoi(argv[1]));
+    auto proxy = new lab32::Proxy(atoi(argv[1]));
 
     if(!proxy->getProxyOn()){
         return 0;

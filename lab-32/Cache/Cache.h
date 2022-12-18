@@ -9,36 +9,39 @@
 #include <iostream>
 #include "CacheRecord.h"
 
-class CacheRecord;
+namespace lab32 {
 
-class Cache {
-private:
-    std::map<std::string, CacheRecord *> cache;
-    bool ran_out_of_memory = false;
-    pthread_mutex_t mutex;
+    class CacheRecord;
 
-public:
-    Cache();
+    class Cache {
+    private:
+        std::map<std::string, CacheRecord *> cache;
+        bool ran_out_of_memory = false;
+        pthread_mutex_t mutex;
 
-    ~Cache();
+    public:
+        Cache();
 
-    bool isCached(const std::string &url);
+        ~Cache();
 
-    CacheRecord *addRecord(const std::string &url);
+        bool isCached(const std::string &url);
 
-    void wakeUpReaders();
+        CacheRecord *addRecord(const std::string &url);
 
-    bool empty() { return cache.empty(); };
+        void wakeUpReaders();
 
-    bool ranOutOfMemory();
+        bool empty() { return cache.empty(); };
 
-    void setRanOutOfMemory();
+        bool ranOutOfMemory();
 
-    CacheRecord *getRecord(const std::string &url);
+        void setRanOutOfMemory();
 
-    void deleteDeadRecords();
+        CacheRecord *getRecord(const std::string &url);
 
-};
+        void deleteDeadRecords();
 
+    };
+
+}
 
 #endif //LAB32_CACHE_H

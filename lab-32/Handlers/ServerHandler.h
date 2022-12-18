@@ -8,30 +8,32 @@
 #define my_delete(x) {delete x; x = NULL;}
 #define timeOut 1000
 
-class ServerHandler {
-private:
-    int serverSocket;
-    pollfd connection;
-    CacheRecord *cacheRecord;
+namespace lab32 {
 
-public:
+    class ServerHandler {
+    private:
+        int serverSocket;
+        pollfd connection;
+        CacheRecord *cacheRecord;
 
-    static void *serverHandlerRoutine(void *args);
+    public:
 
-    ServerHandler(int socket, CacheRecord *record);
+        static void *serverHandlerRoutine(void *args);
 
-    int getSocket() const { return serverSocket; };
+        ServerHandler(int socket, CacheRecord *record);
 
-    CacheRecord *getCacheRecord() { return cacheRecord; };
+        int getSocket() const { return serverSocket; };
 
-    void setRecordInvalid() { cacheRecord->setBroken(); };
+        CacheRecord *getCacheRecord() { return cacheRecord; };
 
-    ~ServerHandler();
+        void setRecordInvalid() { cacheRecord->setBroken(); };
 
-    bool receive();
+        ~ServerHandler();
 
-    void addNewConnection(short event);
-};
+        bool receive();
 
+        void addNewConnection(short event);
+    };
+}
 
 #endif //LAB32_SERVERHANDLER_H

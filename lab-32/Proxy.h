@@ -17,53 +17,56 @@
 
 #define my_delete(x) {delete x; x = NULL;}
 
-class Proxy {
-private:
-    sockaddr_in address{};
-    int proxySocket;
-    bool proxyOn = false;
-    Cache *cache;
-    pthread_mutex_t stoppingMutex{};
-    static pthread_mutex_t mapMutex;
-    static std::map<pthread_t, bool> handlerStatus;
+namespace lab32 {
 
-    static void cleanHandlers();
+    class Proxy {
+    private:
+        sockaddr_in address{};
+        int proxySocket;
+        bool proxyOn = false;
+        Cache *cache;
+        pthread_mutex_t stoppingMutex{};
+        static pthread_mutex_t mapMutex;
+        static std::map<pthread_t, bool> handlerStatus;
 
-    int createProxySocket(int port);
+        static void cleanHandlers();
 
-    bool initProxySocket();
+        int createProxySocket(int port);
 
-    static void cleanDoneHandlers();
+        bool initProxySocket();
+
+        static void cleanDoneHandlers();
 
 
-public:
+    public:
 
-    bool getProxyOn() const {return proxyOn;};
+        bool getProxyOn() const { return proxyOn; };
 
-    explicit Proxy(int port);
+        explicit Proxy(int port);
 
-    ~Proxy();
+        ~Proxy();
 
-    void run();
+        void run();
 
-    void stopProxy();
+        void stopProxy();
 
-    bool shouldStop();
+        bool shouldStop();
 
-    int getSocket() const { return proxySocket; };
+        int getSocket() const { return proxySocket; };
 
-    static void addHandler(pthread_t tid);
+        static void addHandler(pthread_t tid);
 
-    static void setHandlerDone(pthread_t tid);
+        static void setHandlerDone(pthread_t tid);
 
-    static void removeHandler(pthread_t tid);
+        static void removeHandler(pthread_t tid);
 
-    static void cancelHandlers();
+        static void cancelHandlers();
 
-    void returnRead();
+        void returnRead();
 
-    static bool isDone(pthread_t tid);
-};
+        static bool isDone(pthread_t tid);
+    };
 
+}
 
 #endif //LAB32_PROXY_H

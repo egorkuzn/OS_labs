@@ -9,63 +9,65 @@
 
 #define defaultIterationsAlive 100
 
-class Cache;
+namespace lab32 {
 
-class CacheRecord {
-private:
-    Cache *cache;
-    bool is_fully_cached = false;
-    std::string data;
-    bool is_broken = false;
-    pthread_mutex_t mutex;
-    pthread_cond_t condVar;
-    volatile int observersCount;
-    bool isDelete = false;
-    size_t iterationsAlive = defaultIterationsAlive;
+    class Cache;
 
-public:
+    class CacheRecord {
+    private:
+        Cache *cache;
+        bool is_fully_cached = false;
+        std::string data;
+        bool is_broken = false;
+        pthread_mutex_t mutex;
+        pthread_cond_t condVar;
+        volatile int observersCount;
+        bool isDelete = false;
+        size_t iterationsAlive = defaultIterationsAlive;
 
-    size_t getIterationsAlive();
+    public:
 
-    void Iteration();
+        size_t getIterationsAlive();
 
-    void recoverIterationsAlive(){
-        iterationsAlive = defaultIterationsAlive;
-    }
+        void Iteration();
 
-    size_t getDataSize();
+        void recoverIterationsAlive() {
+            iterationsAlive = defaultIterationsAlive;
+        }
 
-    explicit CacheRecord(Cache *cache);
+        size_t getDataSize();
 
-    ~CacheRecord();
+        explicit CacheRecord(Cache *cache);
 
-    void setBroken();
+        ~CacheRecord();
 
-    bool isBroken();
+        void setBroken();
 
-    std::string read(size_t start, size_t length);
+        bool isBroken();
 
-    void write(const std::string &);
+        std::string read(size_t start, size_t length);
 
-    void setFullyCached();
+        void write(const std::string &);
 
-    bool isFullyCached();
+        void setFullyCached();
 
-    void incrementObserversCount();
+        bool isFullyCached();
 
-    void decrementObserversCount();
+        void incrementObserversCount();
 
-    int getObserversCount();
+        void decrementObserversCount();
 
-    void wakeUpReaders();
+        int getObserversCount();
 
-    void setDelete();
+        void wakeUpReaders();
 
-    bool getDelete();
+        void setDelete();
 
-    bool tryDeleteRecord();
-};
+        bool getDelete();
 
+        bool tryDeleteRecord();
+    };
 
+}
 
 #endif //LAB32_CACHERECORD_H
