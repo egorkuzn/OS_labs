@@ -46,6 +46,7 @@ bool ClientHandler::receive(ClientHandler* client){
     ssize_t len;
     request.erase();
     if(record != nullptr && record->isBroken()){
+        errorMsg = "Some was broken or null\n";
         return false;
     }
 
@@ -158,6 +159,14 @@ bool ClientHandler::isOneLineRequest() {
     return request.find_first_of('\n') == request.find_last_of('\n');
 }
 
+void ClientHandler::changeRequestMethodPath(std::string host) {
+    if (request.find_first_of(host) != request.find_last_of(host)) {
+        std::string firstPartOfRequest = request.substr(0, request.find_first_of(host) - 1);
+        std::string secondPartOfRequest = request.substr(request.find_first_of(host) + host.length());
+        request = firstPartOfRequest + secondPartOfRequest;
+    }
+}
+
 bool ClientHandler::RequestParser(){
     if (request.size() <= 8) return false;
 
@@ -171,6 +180,7 @@ bool ClientHandler::RequestParser(){
     }
     std::string HTTPMethod = getMethod(request);
     std::cout << HTTPMethod << std::endl;
+
     if (HTTPMethod != "GET" && HTTPMethod != "POST") {
         char NOT_ALLOWED[59] = "HTTP/1.0 405 METHOD NOT ALLOWED\r\n\r\n Method Not Allowed";
         write(clientSocket, NOT_ALLOWED, 59);
@@ -189,12 +199,19 @@ bool ClientHandler::RequestParser(){
         port = "80";
     }
 
+    std::cout << host << std::endl;
     std::cout << serverMethodPath << std::endl;
     std::cout << url << std::endl;
+
+    if (serverMethodPath.find(host) != std::string::npos) {
+        serverMethodPath = serverMethodPath.substr(serverMethodPath.find(host) + host.length());
+    }
 
     if (isOneLineRequest()) {
         std::cout << "One line mode detected" << std::endl;
         buildRequest(HTTPMethod, serverMethodPath);
+    } else {
+        changeRequestMethodPath(host);
     }
 
     return true;

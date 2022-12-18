@@ -20,31 +20,20 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cb36e24c-0645-4903-b8e2-e415f2bb2f5f" name="Changes" comment="lab 31 update">
-      <change afterPath="$PROJECT_DIR$/lab-32/CMakeLists.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lab-32/Cache/Cache.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lab-32/Cache/Cache.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lab-32/Cache/CacheRecord.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lab-32/Cache/CacheRecord.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lab-32/Handlers/ClientHandler.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lab-32/Handlers/ClientHandler.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lab-32/Handlers/ConnectionHandler.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lab-32/Handlers/ServerHandler.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lab-32/Handlers/ServerHandler.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lab-32/Main.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lab-32/Proxy.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lab-32/Proxy.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lab-31/Cache/CacheRecord.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/lab-31/Cache/CacheRecord.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lab-31/Cache/CacheRecord.h" beforeDir="false" afterPath="$PROJECT_DIR$/lab-31/Cache/CacheRecord.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lab-31/Proxy.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/lab-31/Proxy.cpp" afterDir="false" />
-    </list>
+    <list default="true" id="cb36e24c-0645-4903-b8e2-e415f2bb2f5f" name="Changes" comment="Lab32: comments update" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="CMakeLists.txt" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -57,51 +46,48 @@
     <option name="minorVersion" value="3" />
   </component>
   <component name="ProjectId" id="2IdG1PEuFjzyoOfTi2KKofavkNb" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;//wsl$/Ubuntu/home/egorkuzn/egorkuzn/vscode_prjcts/OS_labs/lab-31&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "cidr.known.project.marker": "true",
+    "last_opened_file_path": "//wsl$/Ubuntu/home/egorkuzn/egorkuzn/vscode_prjcts/OS_labs/lab-31",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="\\wsl$\Ubuntu\home\egorkuzn\egorkuzn\vscode_prjcts\OS_labs\lab-31" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="\\wsl$\Ubuntu\home\egorkuzn\egorkuzn\vscode_prjcts\OS_labs\lab-32" />
+      <recent name="\\wsl$\Ubuntu\home\egorkuzn\egorkuzn\vscode_prjcts\OS_labs\lab-32\Logger" />
     </key>
   </component>
-  <component name="RunManager" selected="CMake Application.Lab32">
-    <configuration name="Lab31" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="9000" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Lab32" TARGET_NAME="Lab31" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Lab32" RUN_TARGET_NAME="Lab31">
+  <component name="RunManager">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Lab32" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="9000" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Lab32" TARGET_NAME="Lab32" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Lab32" RUN_TARGET_NAME="Lab32">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Lab32" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Lab32" TARGET_NAME="Lab32" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Lab32" RUN_TARGET_NAME="Lab32">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Main.cpp - WSL" type="CppFileRunConfiguration" factoryName="CppFileRunConfiguration" nameIsGenerated="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Lab31" TARGET_NAME="Main.cpp - WSL" CONFIG_NAME="Main.cpp - WSL">
-      <option name="sourceFile" value="\\wsl$\Ubuntu\home\egorkuzn\egorkuzn\vscode_prjcts\OS_labs\lab-31\Main.cpp" />
-      <option name="toolchainName" value="WSL" />
-      <method v="2">
-        <option name="com.jetbrains.cidr.cpp.runfile.CppFileBuildBeforeRunTaskProvider$BasicBuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
-    <list>
-      <item itemvalue="C/C++ File.Main.cpp - WSL" />
-      <item itemvalue="CMake Application.Lab31" />
-      <item itemvalue="CMake Application.Lab32" />
-    </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -116,6 +102,7 @@
       <workItem from="1670733024548" duration="20607000" />
       <workItem from="1670843018351" duration="155000" />
       <workItem from="1671290489701" duration="66000" />
+      <workItem from="1671341965180" duration="15924000" />
     </task>
     <task id="LOCAL-00001" summary="updated">
       <created>1670736718032</created>
@@ -138,13 +125,68 @@
       <option name="project" value="LOCAL" />
       <updated>1670748861797</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Logger added. 32-lab codding">
+      <created>1671344923017</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1671344923017</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Logger added. 32-lab codding">
+      <created>1671354338496</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1671354338496</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Logger added. 32-lab codding">
+      <created>1671355774808</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1671355774808</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Lab32: telnet mode activated">
+      <created>1671357029181</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1671357029181</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Lab32: comments update">
+      <created>1671358202381</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1671358202381</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
+    <ignored-roots>
+      <path value="$PROJECT_DIR$/lab-32/MultithreadedCacheProxy" />
+    </ignored-roots>
     <MESSAGE value="updated" />
     <MESSAGE value="exit changed to return" />
     <MESSAGE value="lab 31 update" />
-    <option name="LAST_COMMIT_MESSAGE" value="lab 31 update" />
+    <MESSAGE value="Logger added. 32-lab codding" />
+    <MESSAGE value="Lab32: telnet mode activated" />
+    <MESSAGE value="Lab32: comments update" />
+    <option name="LAST_COMMIT_MESSAGE" value="Lab32: comments update" />
   </component>
 </project>

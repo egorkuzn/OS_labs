@@ -81,6 +81,8 @@ public:
     std::string getHost(std::string in);
 
     size_t findFirstSpChar(std::string in);
+
+    void changeRequestMethodPath(std::string host);
 };
 
 
