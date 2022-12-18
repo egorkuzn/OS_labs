@@ -161,9 +161,17 @@ bool ClientHandler::isOneLineRequest() {
 
 void ClientHandler::changeRequestMethodPath(std::string host) {
     if (request.find_first_of(host) != request.find_last_of(host)) {
-        std::string firstPartOfRequest = request.substr(0, request.find_first_of(host) - 1);
-        std::string secondPartOfRequest = request.substr(request.find_first_of(host) + host.length());
+        std::cout << request << std::endl;
+
+        std::cout << "------------" << std::endl;
+
+        std::string firstPartOfRequest = request.substr(0, request.find_first_of(' ') + 1);
+        std::string secondPartOfRequest = request.substr(request.find('/') + 1);
+        secondPartOfRequest = secondPartOfRequest.substr(secondPartOfRequest.find('/') + 1);
+        secondPartOfRequest = secondPartOfRequest.substr(secondPartOfRequest.find('/'));
         request = firstPartOfRequest + secondPartOfRequest;
+
+        std::cout << request << std::endl;
     }
 }
 
@@ -188,6 +196,7 @@ bool ClientHandler::RequestParser(){
     }
 
     host = getHost(request);
+    changeRequestMethodPath(host);
     std::string serverMethodPath = getServerMethodPath(request, HTTPMethod);
     url = getUrl(host, serverMethodPath);
     size_t place = host.find(':');
@@ -210,8 +219,6 @@ bool ClientHandler::RequestParser(){
     if (isOneLineRequest()) {
         std::cout << "One line mode detected" << std::endl;
         buildRequest(HTTPMethod, serverMethodPath);
-    } else {
-        changeRequestMethodPath(host);
     }
 
     return true;
