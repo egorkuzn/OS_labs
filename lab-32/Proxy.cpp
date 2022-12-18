@@ -87,6 +87,10 @@ namespace lab31 {
 
     }
 
+    void Proxy::clientsIterator(int i) {
+
+    }
+
     void Proxy::run() {
         int selectedDescNum;
         int timeOut = 1000;
