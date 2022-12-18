@@ -5,6 +5,9 @@
 #include <string>
 #include <iostream>
 #include <sys/poll.h>
+#include <cstring>
+#include <algorithm>
+#include "../Proxy.h"
 #include "../Cache/CacheRecord.h"
 #include "../Cache/Cache.h"
 
@@ -66,6 +69,18 @@ public:
     bool sendRequest(const std::string &request) const;
 
     short returnRead(pollfd* conn);
+
+    bool isOneLineRequest();
+
+    void buildRequest(std::string &HTTPMethod, std::string &serverMethodPath);
+
+    std::string getUrl(std::string host, std::string serverMethodPath);
+
+    std::string getServerMethodPath(std::string in, std::string HTTPMethod);
+
+    std::string getHost(std::string in);
+
+    size_t findFirstSpChar(std::string in);
 };
 
 

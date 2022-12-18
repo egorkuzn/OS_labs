@@ -1,6 +1,5 @@
-#include <cstring>
+
 #include "ClientHandler.h"
-#include "../Proxy.h"
 
 ClientHandler::ClientHandler(int sock) {
     this->clientSocket = sock;
@@ -8,7 +7,6 @@ ClientHandler::ClientHandler(int sock) {
     this->host = "";
     this->headers = "";
     this->record = nullptr;
-
 }
 
 void ClientHandler::deleteEvent(pollfd* conn, short event) {
@@ -98,73 +96,107 @@ bool ClientHandler::receive(ClientHandler* client){
     return true;
 }
 
+size_t ClientHandler::findFirstSpChar(std::string in) {
+    std::vector<size_t> indexes = {};
+    indexes.push_back(in.find('\n'));
+    indexes.push_back(in.find('\r'));
+    indexes.push_back(in.find(' '));
+    std::sort(indexes.begin(), indexes.end());
+
+    return indexes[0];
+}
+
 std::string ClientHandler::getPrVersion(std::string in){
     std::string req = std::move(in);
     size_t start = req.find("HTTP/");
-    size_t end = req.find("\r\n");
-    if(start == std::string::npos || end == std::string::npos) {
-        std::cerr <<"parse Host error" << std::endl;
-        return "";
-    }
-    return req.substr(start + 5, end - start - 5);
+
+    return req.substr(start + 5, 3);
 }
 
-std::string getHost(std::string in){
+std::string ClientHandler::getHost(std::string in){
     std::string req = std::move(in);
-    size_t start = req.find("Host:");
-    size_t end = req.find("User-Agent:");
-    if(start == std::string::npos || end == std::string::npos) {
-        std::cerr <<"parse Host error" << std::endl;
-        return "";
-    }
-    return req.substr(start + 6, end - start - 8);
+    std::string afterHostString = req.substr(req.find("Host:") + 6);
+    size_t end = findFirstSpChar(afterHostString);
+    return afterHostString.substr(0, end);
 }
 
-std::string ClientHandler::getUrl(std::string in){
+std::string ClientHandler::getServerMethodPath(std::string in, std::string HTTPMethod) {
     std::string req = std::move(in);
-    size_t start = req.find(' ');
-    size_t end = req.find("HTTP");
-    if(start == std::string::npos || end == std::string::npos) {
-        std::cerr <<"parse URL error" << std::endl;
-        return "";
-    }
-    return req.substr(start + 1 , end - start - 2);
+    req = req.substr(req.find(HTTPMethod) + HTTPMethod.length());
+    req = req.substr(req.find('/'));
+    int start = (req[1] == '/') ? 1 : 0;
+    return req.substr(start, findFirstSpChar(req));
+}
+
+std::string ClientHandler::getUrl(std::string host, std::string serverMethodPath){
+    return "http://" + host + serverMethodPath;
 }
 
 std::string ClientHandler::getMethod(std::string in){
     std::string req = std::move(in);
     size_t end = req.find(' ');
+
     if(end == std::string::npos) {
         std::cerr <<"parse URL error" << std::endl;
         return "";
     }
+
     return req.substr(0, end);
 }
 
+void ClientHandler::buildRequest(std::string& HTTPMethod,
+                                 std::string& serverMethodPath) {
+    request.clear();
+    request = HTTPMethod + " " + serverMethodPath + " HTTP/" + prVersion + "\r\n";
+    request += "Accept: text/html\r\n";
+    request += "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36\r\n";
+    request += "Host: " + host + "\r\n";
+    request += "Connection: keep-alive\r\n\r\n";
+}
+
+bool ClientHandler::isOneLineRequest() {
+    return request.find_first_of('\n') == request.find_last_of('\n');
+}
+
 bool ClientHandler::RequestParser(){
+    if (request.size() <= 8) return false;
+
     prVersion = getPrVersion(request);
-    if(prVersion!="1.1" && prVersion!="1.0" ){
+    std::cout << prVersion << std::endl;
+
+    if (prVersion!="1.1" && prVersion!="1.0") {
         char NOT_ALLOWED[71] = "HTTP/1.0 505 HTTP VERSION NOT SUPPORTED\r\n\r\n HTTP Version Not Supported";
         write(clientSocket, NOT_ALLOWED, 71);
-        errorMsg = "HTTP Version Not Supported " + prVersion;
         return false;
     }
-    //std::cout << prVersion << '\n';
     std::string HTTPMethod = getMethod(request);
-    //std::cout << HTTPMethod << '\n';
-    if(HTTPMethod != "GET" && HTTPMethod != "POST"){
+    std::cout << HTTPMethod << std::endl;
+    if (HTTPMethod != "GET" && HTTPMethod != "POST") {
         char NOT_ALLOWED[59] = "HTTP/1.0 405 METHOD NOT ALLOWED\r\n\r\n Method Not Allowed";
         write(clientSocket, NOT_ALLOWED, 59);
-        errorMsg = "HTTP Method Not Allowed";
         return false;
     }
-    host = ::getHost(request);
+
+    host = getHost(request);
+    std::string serverMethodPath = getServerMethodPath(request, HTTPMethod);
+    url = getUrl(host, serverMethodPath);
     size_t place = host.find(':');
-    if(place!=-1){
-        port = host.substr(place+1, host.size()-place-1);
-        host = host.substr(0,host.find(':'));
+
+    if (place != std::string::npos) {
+        port = host.substr(place + 1, host.size() - place - 1);
+        host = host.substr(0, host.find(':'));
+    } else {
+        port = "80";
     }
-    url = getUrl(request);
+
+    std::cout << serverMethodPath << std::endl;
+    std::cout << url << std::endl;
+
+    if (isOneLineRequest()) {
+        std::cout << "One line mode detected" << std::endl;
+        buildRequest(HTTPMethod, serverMethodPath);
+    }
+
     return true;
 }
 
@@ -178,8 +210,6 @@ void cleanupClient(void *arg) {
     my_delete(client)
     std::cout << "Client # " + std::to_string(pthread_self()) + " freed resources" << '\n';
     //std::cout << "cleaned Client" << '\n';
-
-
 }
 
 pollfd addNewConnection(int socket, short event) {

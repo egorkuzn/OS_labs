@@ -28,7 +28,6 @@ Proxy::Proxy(int port) {
 
     pthread_mutex_init(&stoppingMutex, nullptr);
     pthread_mutex_init(&mapMutex, nullptr);
-
 }
 
 int Proxy::createProxySocket(int port) {
