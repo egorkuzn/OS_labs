@@ -86,7 +86,7 @@ void *signalHandler(void *args) { // thread that sits and waits for incoming sig
 
 void Proxy::run() {
 
-    /* SIGINT  для лохов (пусть ни прокси, ни его потомки не обращают внимание на SIGINT)*/
+    /* пусть ни прокси, ни его потомки не обращают внимание на SIGINT */
     sigset_t mask;
     sigemptyset(&mask);
     sigaddset(&mask, SIGINT | SIGTERM);
@@ -96,20 +96,20 @@ void Proxy::run() {
         pthread_exit(nullptr);
     }
 
-    /* лох (на лекции говорили сделать пайпы и прочие приколы для обработки сигналов, сделаем отдельный поток для обработки SIGINT)*/
+    /* что есть, то есть: на лекции говорили сделать пайпы и прочие приколы для обработки сигналов, сделаем отдельный поток для обработки SIGINT */
     pthread_t signalThread;
     if (pthread_create(&signalThread, nullptr, signalHandler, (void *) this) != 0) {
         std::cerr << "Proxy :: Failed to create server thread" << '\n';
         return;
     }
 
-    /* мы вообще не хотим из основной нити трогать поток обработчик сигналов*/
+    /* мы вообще не хотим из основной нити трогать поток обработчик сигналов */
     if (pthread_detach(signalThread) != 0) {
         std::cerr << "Proxy :: Failed to detach single handling thread" << '\n';
     }
 
 
-    /* и снова poll ибо хз как иначе отслеживать происходящее */
+    /* и снова poll, ибо не ясно, как иначе отслеживать происходящее */
     int selectedDescNum;
 
     std::vector<pollfd> pollingSet;
@@ -125,7 +125,7 @@ void Proxy::run() {
             stopProxy();
         }
 
-        /* poll писос долго может сидеть ждать, поэтому, проверим, мб нас закрыли */
+        /* poll ооочень долго может сидеть ждать, поэтому, проверим, мб нас закрыли */
         if (shouldStop()) {
             break;
         }
@@ -167,7 +167,7 @@ void Proxy::run() {
     /* убиваем всех */
     cancelHandlers();
 
-    /* wake up threads that are sleeping on a cond var*/
+    /* будем всех, кто спит на cond var'e*/
     /*if (!cache->empty()) {  //
         cache->wakeUpReaders();
     }*/
@@ -178,51 +178,47 @@ void Proxy::run() {
 
 template<typename T>
 void clearVector(std::vector<T> &vec) {
-
     std::vector<T>().swap(vec);
     vec.clear();
-
 }
 
 void Proxy::cancelHandlers() {
-
     pthread_mutex_lock(&mapMutex);
+
     for (auto handler : handlerStatus) {
         pthread_cancel(handler.first);
         std::cout << "Proxy :: cancelled thread #" + std::to_string(handler.first) << '\n';
     }
-    pthread_mutex_unlock(&mapMutex);
 
+    pthread_mutex_unlock(&mapMutex);
 }
 
 void Proxy::addHandler(pthread_t tid) {
-
     pthread_mutex_lock(&mapMutex);
     handlerStatus.insert(std::make_pair(tid, false));
     pthread_mutex_unlock(&mapMutex);
-
 }
 
 void Proxy::setHandlerDone(pthread_t tid) {
-
     pthread_mutex_lock(&mapMutex);
     auto itr = handlerStatus.find(tid);
+
     if (itr != handlerStatus.end()) {
         (*itr).second = true;
     }
-    pthread_mutex_unlock(&mapMutex);
 
+    pthread_mutex_unlock(&mapMutex);
 }
 
 void Proxy::removeHandler(pthread_t tid) {
-
     pthread_mutex_lock(&mapMutex);
     auto itr = handlerStatus.find(tid);
+
     if (itr != handlerStatus.end()) {
         handlerStatus.erase(itr);
     }
-    pthread_mutex_unlock(&mapMutex);
 
+    pthread_mutex_unlock(&mapMutex);
 }
 
 bool Proxy::isDone(pthread_t tid){
@@ -295,8 +291,11 @@ Proxy::~Proxy() {
     close(proxySocket);
 }
 
-/* если добавлять нормальную поддержку http 1.1 нкжно сделать:
+/*
+ *  если добавлять нормальную поддержку http 1.1 нкжно сделать:
  *  1) навесить цикл while на  server и client
  *  2) дать им пайпы, чтобы они общались между собой (сообщели о приёме/ отправке данных)
  *  3) повесить poll на пайпы (если не использоапть poll будут холостые циклы)
- *  4) мелкие доработки*/
+ *  4) мелкие доработки
+ *
+ * */
