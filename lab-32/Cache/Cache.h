@@ -17,7 +17,7 @@ namespace lab32 {
     private:
         std::map<std::string, CacheRecord *> cache;
         bool ran_out_of_memory = false;
-        pthread_mutex_t mutex;
+        pthread_mutex_t mutex{};
 
     public:
         Cache();

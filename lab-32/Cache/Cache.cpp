@@ -35,12 +35,15 @@ namespace lab32 {
     CacheRecord *Cache::addRecord(const std::string &url) {
 
         pthread_mutex_lock(&mutex);
+
         if (cache.find(url) != cache.end()) {
             delete cache.find(url)->second;
         }
+
         //std::cout << "Adding new record for " + url << '\n';
         auto record = new CacheRecord(this);
         cache.insert(std::make_pair(url, record));
+
         pthread_mutex_unlock(&mutex);
         return record;
 

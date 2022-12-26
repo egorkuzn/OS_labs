@@ -58,7 +58,7 @@ namespace lab32 {
 
         static void *clientHandlerRoutine(void *args);
 
-        static std::string getPrVersion(std::string in);
+        std::string getPrVersion(std::string in);
 
         static std::string getUrl(std::string in);
 

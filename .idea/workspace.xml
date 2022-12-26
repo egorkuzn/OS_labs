@@ -17,16 +17,26 @@
   <component name="CMakeSettings">
     <configurations>
       <configuration PROFILE_NAME="Debug" ENABLED="true" CONFIG_NAME="Debug" />
+      <configuration PROFILE_NAME="Release" ENABLED="true" CONFIG_NAME="Release" />
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cb36e24c-0645-4903-b8e2-e415f2bb2f5f" name="Changes" comment="Lab32: modified for GET &lt;host&gt;/&lt;method_path&gt;" />
+    <list default="true" id="cb36e24c-0645-4903-b8e2-e415f2bb2f5f" name="Changes" comment="Lab32: namespace added">
+      <change afterPath="$PROJECT_DIR$/lab-32/comments.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lab-32/notes.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab-32/Cache/Cache.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/lab-32/Cache/Cache.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab-32/Cache/Cache.h" beforeDir="false" afterPath="$PROJECT_DIR$/lab-32/Cache/Cache.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab-32/Handlers/ClientHandler.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/lab-32/Handlers/ClientHandler.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab-32/Handlers/ClientHandler.h" beforeDir="false" afterPath="$PROJECT_DIR$/lab-32/Handlers/ClientHandler.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab-32/Proxy.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/lab-32/Proxy.cpp" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Release" />
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
@@ -36,10 +46,12 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-    <option name="UPDATE_TYPE" value="REBASE" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectApplicationVersion">
     <option name="ide" value="CLion" />
@@ -59,6 +71,7 @@
     &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
     &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;full.screen.before.presentation.mode&quot;: &quot;false&quot;,
     &quot;last_opened_file_path&quot;: &quot;//wsl$/Ubuntu/home/egorkuzn/egorkuzn/vscode_prjcts/OS_labs/lab-31&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
@@ -84,11 +97,6 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -104,7 +112,11 @@
       <workItem from="1670843018351" duration="155000" />
       <workItem from="1671290489701" duration="66000" />
       <workItem from="1671341965180" duration="15924000" />
-      <workItem from="1671366509852" duration="7383000" />
+      <workItem from="1671366509852" duration="7926000" />
+      <workItem from="1671446832388" duration="3170000" />
+      <workItem from="1671452058973" duration="1085000" />
+      <workItem from="1671979506064" duration="8524000" />
+      <workItem from="1672049819351" duration="3000" />
     </task>
     <task id="LOCAL-00001" summary="updated">
       <created>1670736718032</created>
@@ -169,7 +181,14 @@
       <option name="project" value="LOCAL" />
       <updated>1671374207907</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Lab32: namespace added">
+      <created>1671379027764</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1671379027764</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -197,6 +216,7 @@
     <MESSAGE value="Lab32: telnet mode activated" />
     <MESSAGE value="Lab32: comments update" />
     <MESSAGE value="Lab32: modified for GET &lt;host&gt;/&lt;method_path&gt;" />
-    <option name="LAST_COMMIT_MESSAGE" value="Lab32: modified for GET &lt;host&gt;/&lt;method_path&gt;" />
+    <MESSAGE value="Lab32: namespace added" />
+    <option name="LAST_COMMIT_MESSAGE" value="Lab32: namespace added" />
   </component>
 </project>

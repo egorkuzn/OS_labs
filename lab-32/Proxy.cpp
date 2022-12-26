@@ -142,6 +142,7 @@ namespace lab32 {
                         std::cerr << "Proxy :: Failed to accept new connection" << '\n';
                         continue;
                     }
+
                     std::cout << "Proxy :: Accepted new connection from client #" + std::to_string(newClientFD) << '\n';
 
                     pthread_t newThread;

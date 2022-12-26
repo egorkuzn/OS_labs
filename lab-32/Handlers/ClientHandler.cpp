@@ -4,15 +4,15 @@
 namespace lab32 {
 
     ClientHandler::ClientHandler(int sock) {
-        this->clientSocket = sock;
-        this->url = "";
-        this->host = "";
-        this->headers = "";
-        this->record = nullptr;
+        this -> clientSocket = sock;
+        this -> url = "";
+        this -> host = "";
+        this -> headers = "";
+        this -> record = nullptr;
     }
 
     void ClientHandler::deleteEvent(pollfd *conn, short event) {
-        conn->events &= ~event;
+        conn -> events &= ~event;
     }
 
     bool ClientHandler::readFromCache(pollfd *connection) {
@@ -25,7 +25,7 @@ namespace lab32 {
 
         int state;
         pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &state);
-        std::string buffer = record->read(readPointer, BUFSIZ);
+        std::string buffer = record -> read(readPointer, BUFSIZ);
         pthread_setcancelstate(state, nullptr);
         ssize_t ret = write(clientSocket, buffer.data(), buffer.size());
         //std::cout << buffer.data() << '\n';
@@ -37,8 +37,10 @@ namespace lab32 {
                 //std::cout << "delete read ability" << '\n';
                 deleteEvent(connection, POLLOUT);
             }
+
             readPointer += buffer.size();
         }
+
         return true;
     }
 
@@ -47,14 +49,16 @@ namespace lab32 {
         char buffer[BUFSIZ];
         ssize_t len;
         request.erase();
-        if (record != nullptr && record->isBroken()) {
+
+        if (record != nullptr && record -> isBroken()) {
             errorMsg = "Some was broken or null\n";
             return false;
         }
 
         len = read(clientSocket, buffer, BUFSIZ);
+
         if (len < 0) {
-            std::cerr << "Failed to readFromCache data from client's socket" << '\n';
+            errorMsg =  "Failed to readFromCache data from client's socket\n";
             return false;
         }
 
@@ -70,32 +74,37 @@ namespace lab32 {
             //auto url = url;
 
             if (!RequestParser()) {
+                errorMsg = "Parse failed\n";
                 return false;
             }
 
             // криво работает смена кэша
             if (record != nullptr) {
                 //record->changeRecordPage(url);
-                record->decrementObserversCount();
+                record -> decrementObserversCount();
             }
 
-            if (!cache->isCached(url)) {
-                record = cache->addRecord(url);
+            if (!cache -> isCached(url)) {
+                record = cache -> addRecord(url);
+
                 if (!createServer(client, record, host, request)) {
-                    std::cerr << "Failed to create new server" << '\n';
+                    errorMsg = "Failed to create new server\n";
                     return false;
                     //pthread_exit((void *) -1);
                 }
+
                 sendRequest(request);
                 std::cout << url + " is not cached yet." << '\n';
             } else {
                 std::cout << url + " is cached." << '\n';
-                record = cache->getRecord(url);
+                record = cache -> getRecord(url);
             }
-            record->incrementObserversCount();
+
+            record -> incrementObserversCount();
             readPointer = 0;
             request.clear();
         }
+
         return true;
     }
 
@@ -113,7 +122,13 @@ namespace lab32 {
         std::string req = std::move(in);
         size_t start = req.find("HTTP/");
 
-        return req.substr(start + 5, 3);
+        try {
+            return req.substr(start + 5, 3);
+        } catch (std::out_of_range e) {
+            std::cout << "*\n" << request.length() << "\n*";
+
+            return "";
+        }
     }
 
     std::string ClientHandler::getHost(std::string in) {
@@ -163,23 +178,15 @@ namespace lab32 {
 
     void ClientHandler::changeRequestMethodPath(std::string host) {
         if (request.find_first_of(host) != request.find_last_of(host)) {
-            std::cout << request << std::endl;
-
-            std::cout << "------------" << std::endl;
-
             std::string firstPartOfRequest = request.substr(0, request.find_first_of(' ') + 1);
             std::string secondPartOfRequest = request.substr(request.find('/') + 1);
             secondPartOfRequest = secondPartOfRequest.substr(secondPartOfRequest.find('/') + 1);
             secondPartOfRequest = secondPartOfRequest.substr(secondPartOfRequest.find('/'));
             request = firstPartOfRequest + secondPartOfRequest;
-
-            std::cout << request << std::endl;
         }
     }
 
     bool ClientHandler::RequestParser() {
-        if (request.size() <= 8) return false;
-
         prVersion = getPrVersion(request);
         std::cout << prVersion << std::endl;
 
